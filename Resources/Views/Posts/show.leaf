@@ -1,0 +1,13 @@
+#extend("base"):
+#export("title"):查看文章#endexport
+#export("body"):
+<h1>#(post.title)</h1>
+<article>
+    <p>#(post.content)</p>
+</article>
+<a href="/posts/#(post.id!)/edit">✏️ 编辑</a>
+<form method="post" action="/posts/#(post.id!)?_method=DELETE">
+    <button type="submit">🗑️ 删除</button>
+</form>
+<a href="/posts">🔙 返回列表</a>
+#endexport

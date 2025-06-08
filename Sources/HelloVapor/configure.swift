@@ -2,6 +2,7 @@ import Vapor
 
 import Fluent // 导入 Fluent 核心
 import FluentPostgresDriver // 导入 PostgreSQL 驱动
+import Leaf // 导入 Leaf 模板引擎
 
 
 // configures your application
@@ -9,6 +10,9 @@ public func configure(_ app: Application) async throws {
     // uncomment to serve files from /Public folder
     app.middleware.use(FileMiddleware(publicDirectory: app.directory.publicDirectory))
     app.middleware.use(APIErrorMiddleware())
+
+    // MARK: - 注册 Leaf 模板引擎
+    app.views.use(.leaf)
     
     // MARK: - 注册数据库
     try databases(app)

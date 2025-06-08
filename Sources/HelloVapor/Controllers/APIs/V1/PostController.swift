@@ -12,6 +12,7 @@ struct PostController: RouteCollection {
     func boot(routes: any RoutesBuilder) throws {
         let posts = routes.grouped("posts")
         posts.get(use: index)
+
         posts.post(use: create)
         posts.group(":postID") { post in
             post.get(use: show)
@@ -19,6 +20,10 @@ struct PostController: RouteCollection {
             post.delete(use: delete)
         }
     }
+
+
+
+
 
     // 看所有文章
     func index(req: Request) async throws -> APIResponse<[OutPost]> {

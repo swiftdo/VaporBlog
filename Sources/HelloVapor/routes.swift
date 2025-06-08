@@ -10,6 +10,16 @@ func routes(_ app: Application) throws {
         return "Hello, world!"
     }
 
-    try app.register(collection: PostController())
+    // MARK-API控制器
+    try app.group("api") { api in
+        try api.group("v1") { v1 in
+            try v1.register(collection: PostController())
+        }
+    }
+
+    // MARK-页面控制器
+    try app.group("page") { page in
+        try page.register(collection: PostPageController())
+    }
 
 }
