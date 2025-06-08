@@ -1,0 +1,22 @@
+{
+    "configurations": [
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:HelloVapor}",
+            "name": "Debug HelloVapor",
+            "program": "${workspaceFolder:HelloVapor}/.build/debug/HelloVapor",
+            "preLaunchTask": "swift: Build Debug HelloVapor"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:HelloVapor}",
+            "name": "Release HelloVapor",
+            "program": "${workspaceFolder:HelloVapor}/.build/release/HelloVapor",
+            "preLaunchTask": "swift: Build Release HelloVapor"
+        }
+    ]
+}

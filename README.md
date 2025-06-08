@@ -25,3 +25,18 @@ swift test
 - [Vapor Documentation](https://docs.vapor.codes)
 - [Vapor GitHub](https://github.com/vapor)
 - [Vapor Community](https://github.com/vapor-community)
+
+## docker
+
+```sh
+docker run --name some-postgres-test \
+    -e POSTGRES_DB=vapor_blog_db \
+    -e POSTGRES_USER=postgres \
+    -e POSTGRES_PASSWORD=mysecretpassword \
+    -p 5232:5432 \
+    -d postgres
+```
+
+
+
+

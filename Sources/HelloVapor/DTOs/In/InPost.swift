@@ -1,0 +1,18 @@
+//
+//  InPost.swift
+//  HelloVapor
+//
+//  Created by laijihua on 2025/6/6.
+//
+
+import Vapor
+
+struct InPost: In, Validatable {
+    let title: String
+    let content: String
+
+    static func validations(_ validations: inout Validations) {
+        validations.add("title", as: String.self, is: .count(1...), customFailureDescription: "标题不能为空")
+        validations.add("content", as: String.self, is: .count(1...), customFailureDescription: "内容不能为空")
+    }
+}
