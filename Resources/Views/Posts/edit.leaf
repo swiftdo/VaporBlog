@@ -1,10 +1,16 @@
 #extend("base"):
-#export("title"):编辑文章#endexport
+#export("title"):
+编辑文章
+#endexport
+
 #export("body"):
 <h1>编辑文章</h1>
-<form method="post" action="/posts/#(post.id!)?_method=PUT">
+<form method="post" action="/page/posts/#(post.id)">
+    <input type="hidden" name="_method" value="put"/>
     <label>标题：<input type="text" name="title" value="#(post.title)" required></label><br>
     <label>内容：<textarea name="content" rows="6">#(post.content)</textarea></label><br>
     <button type="submit">保存修改</button>
 </form>
 #endexport
+
+#endextend

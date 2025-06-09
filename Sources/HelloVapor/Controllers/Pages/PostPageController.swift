@@ -2,22 +2,58 @@ import Vapor
 struct PostPageController: RouteCollection {
     func boot(routes: any RoutesBuilder) throws {
         let posts = routes.grouped("posts")
-        posts.get(use: indexPage)
-        posts.get("create", use: createPage)
-        posts.get(":id", use: showPage)
-        posts.get(":id", "edit", use: editPage)
+        
+        // GET 请求：页面展示
+        posts.get(use: indexPage)                // 列表页面
+        posts.get("create", use: createPage)     // 创建页面
+        posts.get(":id", use: showPage)          // 详情页面
+        posts.get(":id", "edit", use: editPage)  // 编辑页面
+        
+        
+        // 数据操作
+        posts.post(use: storeAction)             // 创建资源
+        posts.put(":id", use: updateAction)      // 更新资源
+        posts.delete(":id", use: deleteAction)   // 删除资源
+    }
+    
+    // 保存新文章
+    func storeAction(req: Request) async throws -> Response {
+        let post = try req.content.decode(Post.self)
+        try await post.save(on: req.db)
+        return req.redirect(to: "/page/posts")
+    }
+
+    // 更新文章
+    func updateAction(req: Request) async throws -> Response {
+        guard let post = try await Post.find(req.parameters.get("id"), on: req.db) else {
+            throw Abort(.notFound)
+        }
+        let input = try req.content.decode(InPost.self)
+        post.title = input.title
+        post.content = input.content
+        try await post.save(on: req.db)
+        return req.redirect(to: "/page/posts")
+    }
+
+    // 删除文章
+    func deleteAction(req: Request) async throws -> Response {
+        guard let post = try await Post.find(req.parameters.get("id"), on: req.db) else {
+            throw Abort(.notFound)
+        }
+        try await post.delete(on: req.db)
+        return req.redirect(to: "/page/posts")
     }
 
 
     // 列表页
     func indexPage(req: Request) async throws -> View {
         let posts = try await Post.query(on: req.db).sort(\.$createdAt, .descending).all()
-        return try await req.view.render("Posts/index", ["posts": posts])
+        return try await req.view.render("posts/index", ["posts": posts])
     }
 
     // 创建页
     func createPage(req: Request) async throws -> View {
-        return try await req.view.render("Posts/create")
+        return try await req.view.render("posts/create")
     }
 
     // 详情页（可选）
@@ -25,7 +61,7 @@ struct PostPageController: RouteCollection {
         guard let post = try await Post.find(req.parameters.get("id"), on: req.db) else {
             throw Abort(.notFound)
         }
-        return try await req.view.render("Posts/show", ["post": post])
+        return try await req.view.render("posts/show", ["post": post])
     }
 
     // 编辑页
@@ -33,6 +69,6 @@ struct PostPageController: RouteCollection {
         guard let post = try await Post.find(req.parameters.get("id"), on: req.db) else {
             throw Abort(.notFound)
         }
-        return try await req.view.render("Posts/edit", ["post": post])
+        return try await req.view.render("posts/edit", ["post": post])
     }
 }

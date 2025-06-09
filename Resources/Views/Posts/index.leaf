@@ -1,22 +1,24 @@
-
 #extend("base"):
+
 #export("title"):
 文章列表
 #endexport
-
 #export("body"):
-<h1>所有文章</h1>
-<a href="/posts/create">➕ 创建新文章</a>
-<ul>
-#for(post in posts):
-    <li>
-        <a href="/posts/#(post.id!)">#(post.title)</a>
-        (<a href="/posts/#(post.id!)/edit">编辑</a>)
-        <form method="post" action="/posts/#(post.id!)?_method=DELETE">
-            <button type="submit">删除</button>
-        </form>
-    </li>
-#endfor
-</ul>
-
+    <h1>所有文章</h1>
+    <a href="/page/posts/create">➕ 创建新文章</a>
+    <ul>
+    #for(post in posts):
+        <li>
+            <a href="/page/posts/#(post.id)">#(post.title)</a>
+            (<a href="/page/posts/#(post.id)/edit">编辑</a>)
+            <form method="post" action="/page/posts/#(post.id)">
+                <input type="hidden" name="_method" value="delete"/>
+                <button type="submit">删除</button>ßßß
+            </form>
+        </li>
+    #endfor
+    
+    </ul>
 #endexport
+    
+#endextend
