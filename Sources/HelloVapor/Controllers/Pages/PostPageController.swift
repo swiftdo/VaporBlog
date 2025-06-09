@@ -12,8 +12,8 @@ struct PostPageController: RouteCollection {
         
         // 数据操作
         posts.post(use: storeAction)             // 创建资源
-        posts.put(":id", use: updateAction)      // 更新资源
-        posts.delete(":id", use: deleteAction)   // 删除资源
+        posts.post(":id", "update", use: updateAction)     // 更新资源, 因为表单不支持 put
+        posts.post(":id", "delete", use: deleteAction)   // 删除资源, 因为表单不支持 delete
     }
     
     // 保存新文章

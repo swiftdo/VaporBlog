@@ -9,11 +9,10 @@
     <ul>
     #for(post in posts):
         <li>
-            <a href="/page/posts/#(post.id)">#(post.title)</a>
-            (<a href="/page/posts/#(post.id)/edit">编辑</a>)
-            <form method="post" action="/page/posts/#(post.id)">
-                <input type="hidden" name="_method" value="delete"/>
-                <button type="submit">删除</button>ßßß
+            <a href="/page/posts/#(post.id)">#(post.title)：#(post.content)</a>
+            （<a href="/page/posts/#(post.id)/edit">编辑</a>）
+            <form method="post" action="/page/posts/#(post.id)/delete">
+                <button type="submit">删除</button>
             </form>
         </li>
     #endfor

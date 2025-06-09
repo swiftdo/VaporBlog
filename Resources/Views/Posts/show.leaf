@@ -6,8 +6,7 @@
     <p>#(post.content)</p>
 </article>
 <a href="/page/posts/#(post.id)/edit">✏️ 编辑</a>
-<form method="post" action="/page/posts/#(post.id)">
-    <input type="hidden" name="_method" value="delete"/>
+<form method="post" action="/page/posts/#(post.id)/delete">
     <button type="submit">🗑️ 删除</button>
 </form>
 <a href="/page/posts">🔙 返回列表</a>

@@ -8,8 +8,6 @@ import Leaf // 导入 Leaf 模板引擎
 // configures your application
 public func configure(_ app: Application) async throws {
     
-    app.middleware.use(MethodOverrideMiddleware())
-    
     // MARK: - 静态文件中间件（用于 Leaf 模板加载 CSS/JS）
     app.middleware.use(FileMiddleware(publicDirectory: app.directory.publicDirectory))
     // MARK: -自定义错误中间件
