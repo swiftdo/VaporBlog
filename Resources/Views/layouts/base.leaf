@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>#(title)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/third/bootstrap-5.3.6/bootstrap.min.css" rel="stylesheet" />
+    <script src="/third/bootstrap-5.3.6/bootstrap.min.js"></script>
+</head>
+<body>
+    #extend("partials/header")
+    #import("body")
+    #extend("partials/footer")
+</body>
+</html>

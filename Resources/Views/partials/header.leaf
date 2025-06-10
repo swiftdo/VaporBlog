@@ -1,0 +1,20 @@
+<header class="navbar navbar-expand-lg navbar-light bg-light px-3 shadow-sm">
+    <a class="navbar-brand fw-bold" href="/">VaporBlog</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="切换导航">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarContent">
+        <ul class="navbar-nav ms-auto">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="userMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    用户名
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
+                    <li><a class="dropdown-item" href="/admin/profile">个人资料</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="/logout">退出登录</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+</header>
