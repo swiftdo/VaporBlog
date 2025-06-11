@@ -13,7 +13,6 @@
         #import("body")
     </main>
     #extend("partials/footer")
-    <script src="/third/bootstrap-5.3.6/bootstrap.min.js"></script>
     <script src="/third/bootstrap-5.3.6/bootstrap.bundle.min.js"></script>
 </body>
 </html>
