@@ -3,7 +3,13 @@
         {
             "type": "swift",
             "request": "launch",
-            "args": [],
+            "args": [
+                "serve",
+                "--env",
+                "development",
+                "--log",
+                "debug"
+            ],
             "cwd": "${workspaceFolder:HelloVapor}",
             "name": "Debug HelloVapor",
             "program": "${workspaceFolder:HelloVapor}/.build/debug/HelloVapor",
