@@ -1,23 +1,28 @@
-#extend("base"):
+#extend("layouts/base"):
 
 #export("title"):
 文章列表
 #endexport
 #export("body"):
-    <h1>所有文章</h1>
-    <a href="/page/posts/create">➕ 创建新文章</a>
-    <ul>
-    #for(post in posts):
-        <li>
-            <a href="/page/posts/#(post.id)">#(post.title)：#(post.content)</a>
-            （<a href="/page/posts/#(post.id)/edit">编辑</a>）
-            <form method="post" action="/page/posts/#(post.id)/delete">
-                <button type="submit">删除</button>
-            </form>
-        </li>
-    #endfor
-    
-    </ul>
+    <div class="container mt-4">
+        <h1 class="mb-4">所有文章</h1>
+        <a href="/page/posts/create" class="btn btn-primary mb-3">➕ 创建新文章</a>
+        <ul class="list-group">
+        #for(post in posts):
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <a href="/page/posts/#(post.id)" class="fw-bold">#(post.title)</a>
+                </div>
+                <div>
+                    <a href="/page/posts/#(post.id)/edit" class="btn btn-sm btn-outline-secondary me-2">编辑</a>
+                    <form method="post" action="/page/posts/#(post.id)/delete" class="d-inline" onsubmit="return confirm('确定要删除这篇文章吗？');">
+                        <button type="submit" class="btn btn-sm btn-danger">删除</button>
+                    </form>
+                </div>
+            </li>
+        #endfor
+        </ul>
+    </div>
 #endexport
-    
+
 #endextend
