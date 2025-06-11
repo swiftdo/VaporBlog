@@ -6,6 +6,7 @@
     <title>OldBirds - 个人简介</title>
     <link href="/third/bootstrap-5.3.6/bootstrap.min.css" rel="stylesheet" />
     <style>
+        /* ...已有样式... */
         body {
             background: linear-gradient(135deg, #f8fafc 0%, #e0e7ef 100%);
         }
@@ -112,7 +113,7 @@
         <div class="section-card fade-in delay-3">
             <h4 class="fw-bold mb-3">自媒体</h4>
             <ul class="list-unstyled fs-6 mb-0">
-                <li class="mb-1">掘金：<a href="https://juejin.cn/user/325111172054350" target="_blank">OldBirds</a></li>
+                <li class="mb-1">掘金：<a href="https://juejin.cn/user/325111172054350" target="_blank">yourjuejin</a></li>
                 <li class="mb-1">微信公众号：OldBirds</li>
             </ul>
         </div>
@@ -124,15 +125,15 @@
                     <div>
                         <div class="fw-bold">iDiray</div>
                         <div class="text-muted small mb-1">基于 Git 存储的原子笔记 App</div>
-                        <a href="https://play.google.com/store/apps/details?id=run.oldbird.idiary&pli=1" target="_blank" class="btn btn-sm btn-outline-primary">官网</a>
+                        <a href="https://play.google.com/store/apps/details?id=run.oldbird.idiary&pli=1" target="_blank" class="btn btn-sm btn-outline-primary">前往</a>
                     </div>
                 </li>
                 <li class="media-item">
                     <img src="/imgs/panda-cover.png" alt="Panda Logo" class="media-logo">
                     <div>
                         <div class="fw-bold">Panda</div>
-                        <div class="text-muted small mb-1">基于 TinyPNG 图片压缩神器 App</div>
-                        <a href="https://play.google.com/store/apps/details?id=run.oldbird.panda" target="_blank" class="btn btn-sm btn-outline-primary">官网</a>
+                        <div class="text-muted small mb-1">基于 TinyPNG 的图片压缩神器 App</div>
+                        <a href="https://play.google.com/store/apps/details?id=run.oldbird.panda" target="_blank" class="btn btn-sm btn-outline-primary">前往</a>
                     </div>
                 </li>
             </ul>
@@ -149,6 +150,14 @@
                     </div>
                 </li>
             </ul>
+        </div>
+        <div class="text-center text-muted pb-4 pt-2 small" style="letter-spacing:1px;">
+            <a href="https://beian.miit.gov.cn/" target="_blank" class="text-decoration-none text-secondary">赣ICP备2021010021号-1</a>
+            &nbsp;|&nbsp;
+            <a href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=36011102000528" target="_blank" class="text-decoration-none text-secondary">
+                <img src="/imgs/beian.avif" style="width:16px;height:16px;vertical-align:-2px;margin-right:2px;" alt="备案图标">
+                赣公网安备 36011102000528号
+            </a>
         </div>
     </div>
     <script src="/third/bootstrap-5.3.6/bootstrap.bundle.min.js"></script>
