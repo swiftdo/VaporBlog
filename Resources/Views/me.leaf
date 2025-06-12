@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>OldBirds - 个人简介</title>
+    <link href="/third/bootstrap-5.3.6/bootstrap.min.css" rel="stylesheet" />
+    <style>
+        /* ...已有样式... */
+        body {
+            background: linear-gradient(135deg, #f8fafc 0%, #e0e7ef 100%);
+        }
+        .avatar-animate {
+            animation: floatY 2.5s ease-in-out infinite alternate;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+        }
+        @keyframes floatY {
+            from { transform: translateY(0); }
+            to { transform: translateY(-16px); }
+        }
+        .section-card {
+            background: rgba(255,255,255,0.95);
+            border-radius: 1rem;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+            padding: 2rem 2rem 1.5rem 2rem;
+            margin-bottom: 2rem;
+            transition: box-shadow 0.3s;
+        }
+        .section-card:hover {
+            box-shadow: 0 4px 32px rgba(0,0,0,0.12);
+        }
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 1s forwards;
+        }
+        .fade-in.delay-1 { animation-delay: 0.2s; }
+        .fade-in.delay-2 { animation-delay: 0.4s; }
+        .fade-in.delay-3 { animation-delay: 0.6s; }
+        .fade-in.delay-4 { animation-delay: 0.8s; }
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .media-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            padding-left: 0;
+            list-style: none;
+        }
+        /*
+        .media-item {
+            flex: 1 1 220px;
+            min-width: 220px;
+            max-width: 320px;
+            background: #fff;
+            border-radius: 1rem;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            transition: box-shadow 0.3s;
+        }*/
+        .media-item {
+            background: #fff;
+            border-radius: 1rem;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            transition: box-shadow 0.3s;
+            height: 100%;
+        }
+        .media-item:hover {
+            box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+        }
+        .media-logo {
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            object-fit: cover;
+            margin-right: 1rem;
+            background: #f3f6fa;
+        }
+        .media-cover {
+            width: 72px;
+            height: 72px;
+            border-radius: 12px;
+            object-fit: cover;
+            margin-right: 1rem;
+            background: #f3f6fa;
+        }
+    </style>
+</head>
+<body class="d-flex flex-column min-vh-100 bg-light">
+    <header class="navbar navbar-light bg-white shadow-sm px-3">
+        <span class="navbar-brand fw-bold fs-3">OldBirds</span>
+        <a href="/page/posts" class="btn btn-primary ms-auto">前往博客系统</a>
+    </header>
+    <div class="container py-5" style="max-width: 900px;">
+        <div class="text-center mb-5 fade-in">
+            <img src="/imgs/oldbirds.png" alt="头像" class="rounded-circle avatar-animate" width="130" height="130">
+            <h1 class="mt-4 mb-1 fw-bold" style="letter-spacing:2px;">OldBirds</h1>
+            <p class="text-muted fs-5">全栈开发者 | 技术布道者 | 奶爸一枚</p>
+        </div>
+        <div class="section-card fade-in delay-1">
+            <h4 class="fw-bold mb-3">个人简介</h4>
+            <p class="mb-0 fs-6">
+                热爱技术与创新，专注于 Web、移动端和云原生开发。喜欢分享、乐于开源，致力于用代码改变世界。<br>
+                目前专注于高效开发工具、极简产品和技术内容创作。
+            </p>
+        </div>
+        <div class="section-card fade-in delay-2">
+            <h4 class="fw-bold mb-3">联系方式</h4>
+            <ul class="list-unstyled fs-6 mb-0">
+                <li class="mb-1">📧 邮箱：<a href="mailto:oheroj@email.com">oheroj@email.com</a></li>
+                <li class="mb-1">💬 微信：oheroj</li>
+                <li class="mb-1">🐙 GitHub：<a href="https://github.com/oheroj" target="_blank">oheroj</a></li>
+            </ul>
+        </div>
+        <div class="section-card fade-in delay-3">
+            <h4 class="fw-bold mb-3">自媒体</h4>
+            <ul class="list-unstyled fs-6 mb-0">
+                <li class="mb-1">
+                    掘金：<a href="https://juejin.cn/user/325111172054350" target="_blank">OldBirds</a>
+                </li>
+                <li class="mb-1">
+                    <div class="mb-2">微信公众号：</div>
+                    <div class="row g-4">
+                        <div class="col-me-6">
+                            <img src="/imgs/gzh-wechat-logo.png" alt="微信公众号" style="width:50%;height:auto;border-radius:10px;box-shadow:0 2px 12px rgba(0,0,0,0.10);background:#f3f6fa;padding:8px;">
+                        </div>
+                        <div class="col-me-6"></div>
+                    </div>
+                    
+                </li>
+            </ul>
+        </div>
+        <div class="section-card fade-in delay-4">
+            <h4 class="fw-bold mb-3">我的产品</h4>
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="media-item h-100">
+                        <img src="/imgs/idiray-cover.png" alt="iDiray Logo" class="media-logo">
+                        <div>
+                            <div class="fw-bold">iDiray</div>
+                            <div class="text-muted small mb-1">基于 Git 存储的原子笔记 App</div>
+                            <a href="https://play.google.com/store/apps/details?id=run.oldbird.idiary&pli=1" target="_blank" class="btn btn-sm btn-outline-primary">前往</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="media-item h-100">
+                        <img src="/imgs/panda-cover.png" alt="Panda Logo" class="media-logo">
+                        <div>
+                            <div class="fw-bold">Panda</div>
+                            <div class="text-muted small mb-1">基于 TinyPNG 的图片压缩神器 App</div>
+                            <a href="https://play.google.com/store/apps/details?id=run.oldbird.panda" target="_blank" class="btn btn-sm btn-outline-primary">前往</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="section-card fade-in delay-4">
+            <h4 class="fw-bold mb-3">我的课程</h4>
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="media-item h-100">
+                        <img src="/imgs/vaporblog-cover.png" alt="VaporBlog 课程封面" class="media-cover">
+                        <div>
+                            <div class="fw-bold">VaporBlog</div>
+                            <div class="text-muted small mb-1">基于 Vapor 的极简博客系统</div>
+                            <a href="https://mp.weixin.qq.com/mp/appmsgalbum?__biz=MzI4MDM2MDAzOA==&action=getalbum&album_id=4011584829035593730&from_itemidx=1&from_msgid=2247486416#wechat_redirect" target="_blank" class="btn btn-sm btn-outline-success">《Swift Vapor 实战》</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- 可继续添加更多课程，按需复制 col-md-6 块 -->
+            </div>
+        </div>
+        <div class="text-center text-muted pb-4 pt-2 small" style="letter-spacing:1px;">
+            <a href="https://beian.miit.gov.cn/" target="_blank" class="text-decoration-none text-secondary">赣ICP备2021010021号-1</a>
+            &nbsp;|&nbsp;
+            <a href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=36011102000528" target="_blank" class="text-decoration-none text-secondary">
+                <img src="/imgs/beian.avif" style="width:16px;height:16px;vertical-align:-2px;margin-right:2px;" alt="备案图标">
+                赣公网安备 36011102000528号
+            </a>
+        </div>
+    </div>
+    <script src="/third/bootstrap-5.3.6/bootstrap.bundle.min.js"></script>
+</body>
+</html>

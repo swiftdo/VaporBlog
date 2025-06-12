@@ -26,8 +26,10 @@ public func configure(_ app: Application) async throws {
     // MARK: - 注册 Fluent 迁移
     try migrations(app)
     
-    // MARK: - 执行迁移
-    try await app.autoMigrate();
+    // MARK: - 执行迁移, 正式环境由外部环境设置
+    if app.environment != .production {
+        try await app.autoMigrate();
+    }
 }
 
 // 将迁移配置分离到单独方法
