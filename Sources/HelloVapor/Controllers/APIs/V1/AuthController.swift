@@ -4,22 +4,99 @@ import Fluent
 struct AuthController: RouteCollection { 
     func boot(routes: any RoutesBuilder) throws {
 
-        let authRoutes = routes.grouped("api", "auth")
+        // 这个路由名符合 restful api 规范么？
+        let authRoutes = routes.grouped("auth")
 
-        // authRoutes.post("register", use: register)
-        // authRoutes.post("login", use: login)
+        authRoutes.post("register", use: register)
+        authRoutes.post("login", use: login)
         // authRoutes.post("resetpwd", use: resetPwd)
 
 
         // 需要登录才能进行访问
         // authRoutes.post("logout", use: logout)
         // authRoutes.post("refresh", use: refresh)
-        // authRoutes.get("me", use: me)
         // authRoutes.post("changepwd", use: changePwd)
     
     }
 
+    // 用户注册
+    func register(req: Request) async throws -> APIResponse<OutLogin> {
+        let input = try req.content.decode(InRegister.self)
+
+        return try await req.db.transaction { db in
+            let userAuth = try await UserAuth.query(on: db)
+                .filter(\.$authType == UserAuth.AuthType.email.rawValue)
+                .filter(\.$identifier == input.email)
+                .first()
+
+            if userAuth != nil {
+                throw APIError.alreadyExists(msg:"邮箱已被注册")
+            }
+
+            // 创建用户
+            let user = User(nickname: input.email)
+            try await user.create(on: db)
+
+            // 创建认证记录
+            let auth = UserAuth(
+                userID: try user.requireID(),
+                authType: .email,
+                identifier: input.email,
+                credential: try Bcrypt.hash(input.password)
+            )
+            try await auth.create(on: db)
+            let result = try await generateAuthTokens(for: user, on: db, req: req)
+            return APIResponse(success: result)
+        }
+    }
+
+    // 用户登录
+    func login(req: Request) async throws -> APIResponse<OutLogin> {
+        let input = try req.content.decode(InLogin.self)
+        // 查找认证记录
+        guard
+            let auth = try await UserAuth.query(on: req.db)
+                .filter(\.$authType == UserAuth.AuthType.email.rawValue)
+                .filter(\.$identifier == input.email)
+                .first(),
+            let user = try await User.find(auth.$user.id, on: req.db)
+        else {
+            throw APIError.custom(code: 600, msg: "账号或密码错误")
+        }
+
+        // 检查用户是否被禁用
+        if user.status == User.Status.banned.rawValue {
+            throw APIError.custom(code: 602, msg: "账号已被禁用，请联系管理员")
+        }
+
+        // 验证密码
+        guard let credential = auth.credential, try Bcrypt.verify(input.password, created: credential) else {
+            throw APIError.custom(code: 603, msg: "账号或密码错误")
+        }
+        let result = try await generateAuthTokens(for: user, on: req.db, req: req)
+        return APIResponse(success: result)
+    }
 
 
+
+    // 生成认证令牌
+    private func generateAuthTokens(for user: User, on db: any Database, req: Request) async throws
+        -> OutLogin
+    {
+        let payload = UserPayload(userId: try user.requireID())
+        let token = try await req.jwt.sign(payload)
+
+        let refreshToken = RefreshToken(
+            token: [UInt8].random(count: 32).base64,
+            userID: try user.requireID(),
+            expiresAt: Date().addingTimeInterval(3600 * 24 * 30)
+        )
+        try await refreshToken.create(on: db)
+        return OutLogin(
+            token: token,
+            refreshToken: refreshToken.token,
+            user: OutUser(user: user)
+        )
+    }
 }
 

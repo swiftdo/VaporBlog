@@ -6,9 +6,16 @@ final class User: Model, Content, @unchecked Sendable {
     enum FieldKeys {
         static let id: FieldKey = "id"
         static let nickname: FieldKey = "nickname"
-        static let isBanned: FieldKey = "is_banned"
+        static let status: FieldKey = "status"
         static let createdAt: FieldKey = "created_at"
         static let updatedAt: FieldKey = "updated_at"
+    }
+
+    enum Status: Int {
+        case inactive = 0 // 未激活
+        case active = 1   // 激活，正常状态
+        case banned = 2   // 封禁
+        case deleted = 3  // 删除状态
     }
 
     static let schema = "users"
@@ -19,8 +26,8 @@ final class User: Model, Content, @unchecked Sendable {
     @Field(key: FieldKeys.nickname)
     var nickname: String
 
-    @Field(key: FieldKeys.isBanned)
-    var isBanned: Bool // 表示用户是否被禁用（封禁）的状态标志
+    @Field(key: FieldKeys.status)
+    var status: Int
 
     @Timestamp(key: FieldKeys.createdAt, on: .create)
     var createdAt: Date?
@@ -31,8 +38,8 @@ final class User: Model, Content, @unchecked Sendable {
 
     init() {}
 
-    init(nickname: String, isBanned: Bool = false) {
+    init(nickname: String, status: Status = .inactive) {
         self.nickname = nickname
-        self.isBanned = isBanned
+        self.status = status.rawValue
     }
 }

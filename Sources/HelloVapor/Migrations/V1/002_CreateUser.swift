@@ -8,7 +8,7 @@ struct CreateUser: AsyncMigration {
         try await database.schema(User.schema)
             .id()
             .field(User.FieldKeys.nickname, .string, .required)
-            .field(User.FieldKeys.isBanned, .bool, .required)
+            .field(User.FieldKeys.status, .int, .required)
             .field(User.FieldKeys.createdAt, .datetime, .required)
             .field(User.FieldKeys.updatedAt, .datetime, .required)
             .create()

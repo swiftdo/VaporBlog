@@ -69,13 +69,17 @@ enum APIError : Error {
     case unauthorized(msg: String? = nil)
     case forbidden(msg: String? = nil)
     case notFound(msg: String? = nil)
+    // 已存在
+    case alreadyExists(msg: String? = nil)
     case conflict(msg: String? = nil)
     case tooManyRequests(msg: String? = nil)
     case serverError(msg: String? = nil)
     case serviceUnavailable(msg: String? = nil)
     case businessRuleViolation(msg: String? = nil)
     case externalServiceError(msg: String? = nil)
-    case custom(code: Int, msg: String? = nil)
+
+    // 建议 code 600 以上
+    case custom(code: Int, msg: String? = nil) 
     
     var status: HTTPStatus {
         switch self {
@@ -84,6 +88,7 @@ enum APIError : Error {
         case .forbidden: return .forbidden
         case .notFound: return .notFound
         case .conflict: return .conflict
+        case .alreadyExists: return .conflict
         case .tooManyRequests: return .tooManyRequests
         case .serverError: return .internalServerError
         case .serviceUnavailable: return .serviceUnavailable
@@ -113,6 +118,9 @@ enum APIError : Error {
         case .conflict(let msg):
             message = msg ?? "Resource conflict"
             code = 409
+        case .alreadyExists(let msg):
+            message = msg ?? "Resource already exists"
+            code = 410
         case .tooManyRequests(let msg):
             message = msg ?? "Too many requests"
             code = 429
