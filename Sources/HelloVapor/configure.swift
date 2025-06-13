@@ -34,8 +34,10 @@ public func configure(_ app: Application) async throws {
 
 // 将迁移配置分离到单独方法
 private func migrations(_ app: Application) throws {
-    // 将 CreatePost 迁移添加到应用中，Vapor 会在启动时自动管理这些迁移
     app.migrations.add(CreatePost())
+    app.migrations.add(CreateUser())
+    app.migrations.add(CreateUserAuth())
+    app.migrations.add(CreateRefreshToken())
 }
 
 // 数据库配置

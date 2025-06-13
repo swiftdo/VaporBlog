@@ -1,0 +1,5 @@
+
+final class AuthServiceImpl: AuthService {
+
+
+}

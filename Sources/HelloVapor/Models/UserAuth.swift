@@ -18,15 +18,15 @@ final class UserAuth: Model, Content, @unchecked Sendable {
     @Field(key: FieldKeys.identifier)
     var identifier: String  // 登录标识，比如邮箱或微信的 OpenID
 
-    @Field(key: FieldKeys.credential)
-    var credential: String  // 令牌, 比如密码
+    @OptionalField(key: FieldKeys.credential)
+    var credential: String?  // 令牌, 比如密码
 
     @Timestamp(key: FieldKeys.createdAt, on: .create)
     var createdAt: Date?
 
     init() {}
 
-    init(userID: UUID, authType: AuthType, identifier: String, credential: String) {
+    init(userID: UUID, authType: AuthType, identifier: String, credential: String? = nil) {
         self.$user.id = userID
         self.authType = authType.rawValue
         self.identifier = identifier
