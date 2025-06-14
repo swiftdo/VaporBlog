@@ -1,5 +1,5 @@
-import Vapor
 import Smtp
+import Vapor
 
 /// 定义路由
 func routes(_ app: Application) throws {
@@ -8,15 +8,15 @@ func routes(_ app: Application) throws {
         return req.view.render("me")
     }
 
-    app.get("email") { req async throws in 
-        let email = try! Email(from: EmailAddress(address: "13576051334@163.com", name: "VaporBlog"),
-                  to: [EmailAddress(address: "oheroj@gmail.com")],
-                  subject: "The subject (text)",
-                  body: "This is email body.")
+    app.get("email") { req async throws in
+        let email = try Email(
+            from: EmailAddress(address: "13576051334@163.com", name: "VaporBlog"),
+            to: [EmailAddress(address: "oheroj@gmail.com")],
+            subject: "The subject (text)",
+            body: "This is email body.")
         do {
             try await app.smtp.send(email)
-        }
-        catch {
+        } catch {
             return "Error sending email."
         }
         return "Email sent."
