@@ -1,4 +1,3 @@
-import Smtp
 import Vapor
 
 /// 定义路由
@@ -9,13 +8,8 @@ func routes(_ app: Application) throws {
     }
 
     app.get("email") { req async throws in
-        let email = try Email(
-            from: EmailAddress(address: "13576051334@163.com", name: "VaporBlog"),
-            to: [EmailAddress(address: "oheroj@gmail.com")],
-            subject: "The subject (text)",
-            body: "This is email body.")
         do {
-            try await app.smtp.send(email)
+            try await req.sendEmail(subject: "The subject (text2)", body: "This is email body2.", to: "oheroj@gmail.com", isBodyHtml: false)
         } catch {
             return "Error sending email."
         }

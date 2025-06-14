@@ -3,7 +3,6 @@ import Vapor
 import Fluent // 导入 Fluent 核心
 import FluentPostgresDriver // 导入 PostgreSQL 驱动
 import Leaf // 导入 Leaf 模板引擎
-import Smtp
 
 
 // configures your application
@@ -41,29 +40,9 @@ public func configure(_ app: Application) async throws {
     }
 }
 
+// Mark: - 邮件配置
 private func emails(_ app: Application) throws {
-
-    guard let smtpHost = Environment.get("SMTP_HOST") else {
-        fatalError("Missing SMTP_HOST environment variable.")
-    }
-    guard let smtpPortStr = Environment.get("SMTP_PORT"),
-          let smtpPort = Int(smtpPortStr) else {
-        fatalError("Missing or invalid SMTP_PORT environment variable.")
-    }
-    guard let smtpUserName = Environment.get("SMTP_USERNAME") else {
-        fatalError("Missing SMTP_USERNAME environment variable.")
-    }
-    guard let smtpPassword = Environment.get("SMTP_PASSWORD") else {
-        fatalError("Missing SMTP_PASSWORD environment variable.")
-    }
-
-    // 获取 SMTP 配置
-    app.smtp.configuration = SmtpServerConfiguration(
-        hostname: smtpHost, 
-        port: smtpPort, 
-        signInMethod: .credentials(username: smtpUserName, password: smtpPassword), 
-        secure: .ssl, 
-    )
+    app.email = EmailServiceImpl(app: app)
 }
 
 // 将迁移配置分离到单独方法
