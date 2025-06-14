@@ -9,7 +9,6 @@ struct PostPageController: RouteCollection {
         posts.get(":id", use: showPage)          // 详情页面
         posts.get(":id", "edit", use: editPage)  // 编辑页面
         
-        
         // 数据操作
         posts.post(use: storeAction)             // 创建资源
         posts.post(":id", "update", use: updateAction)     // 更新资源, 因为表单不支持 put

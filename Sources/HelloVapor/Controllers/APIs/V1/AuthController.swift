@@ -1,7 +1,7 @@
-import Vapor
 import Fluent
+import Vapor
 
-struct AuthController: RouteCollection { 
+struct AuthController: RouteCollection {
     func boot(routes: any RoutesBuilder) throws {
 
         // 这个路由名符合 restful api 规范么？
@@ -11,12 +11,11 @@ struct AuthController: RouteCollection {
         authRoutes.post("login", use: login)
         // authRoutes.post("resetpwd", use: resetPwd)
 
-
         // 需要登录才能进行访问
         // authRoutes.post("logout", use: logout)
         // authRoutes.post("refresh", use: refresh)
         // authRoutes.post("changepwd", use: changePwd)
-    
+
     }
 
     // 用户注册
@@ -30,7 +29,7 @@ struct AuthController: RouteCollection {
                 .first()
 
             if userAuth != nil {
-                throw APIError.alreadyExists(msg:"邮箱已被注册")
+                throw APIError.alreadyExists(msg: "邮箱已被注册")
             }
 
             // 创建用户
@@ -45,6 +44,20 @@ struct AuthController: RouteCollection {
                 credential: try Bcrypt.hash(input.password)
             )
             try await auth.create(on: db)
+
+            // 生成激活码
+            let code = try generateActivationCode(userId: user.requireID(), email: input.email)
+            let expiredAt = Date().addingTimeInterval(30 * 60)  // 30分钟有效
+            let verify =  EmailVerifyCode(
+                email: input.email, code: code, type: EmailVerifyCode.VerifyType.activation,
+                expiredAt: expiredAt
+            )
+            try await verify.create(on: db)
+
+            // 发送邮件
+            
+
+            // 创建 token
             let result = try await generateAuthTokens(for: user, on: db, req: req)
             return APIResponse(success: result)
         }
@@ -70,14 +83,55 @@ struct AuthController: RouteCollection {
         }
 
         // 验证密码
-        guard let credential = auth.credential, try Bcrypt.verify(input.password, created: credential) else {
+        guard let credential = auth.credential,
+            try Bcrypt.verify(input.password, created: credential)
+        else {
             throw APIError.custom(code: 603, msg: "账号或密码错误")
         }
         let result = try await generateAuthTokens(for: user, on: req.db, req: req)
         return APIResponse(success: result)
     }
 
+    // 生成验证邮件的 token
 
+    func activate(req: Request) async throws -> APIResponse<OutEmpty> {
+        struct Input: Content {
+            let email: String
+            let code: String
+        }
+        let input = try req.content.decode(Input.self)
+        // 校验激活码
+        guard
+            let verify = try await EmailVerifyCode.query(on: req.db)
+                .filter(\.$email == input.email)
+                .filter(\.$code == input.code)
+                .filter(\.$type == "activation")
+                .filter(\.$expiredAt > Date())
+                .first()
+        else {
+            throw APIError.custom(code: 601, msg: "激活码无效或已过期")
+        }
+        // 查找用户并激活
+        guard
+            let user = try await User.query(on: req.db)
+                .filter(\.$nickname == input.email)
+                .first()
+        else {
+            throw APIError.notFound(msg: "用户不存在")
+        }
+        user.status = User.Status.active.rawValue
+        try await user.save(on: req.db)
+        try await verify.delete(on: req.db)
+        return APIResponse(success: OutEmpty())
+    }
+
+    /// 生成激活码：用户id + 邮箱 + 时间戳，md5
+    func generateActivationCode(userId: UUID, email: String) -> String {
+        let timestamp = Int(Date().timeIntervalSince1970)
+        let raw = "\(userId.uuidString)|\(email)|\(timestamp)"
+        let digest = Insecure.MD5.hash(data: raw.data(using: .utf8)!)
+        return digest.map { String(format: "%02hhx", $0) }.joined()
+    }
 
     // 生成认证令牌
     private func generateAuthTokens(for user: User, on db: any Database, req: Request) async throws
@@ -99,4 +153,3 @@ struct AuthController: RouteCollection {
         )
     }
 }
-
