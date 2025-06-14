@@ -36,9 +36,9 @@ public func configure(_ app: Application) async throws {
     try emails(app)
     
     // MARK: - 执行迁移, 正式环境由外部环境设置
-    // if app.environment != .production {
-    //     try await app.autoMigrate();
-    // }
+    if app.environment != .production {
+        try await app.autoMigrate();
+    }
 }
 
 private func emails(_ app: Application) throws {

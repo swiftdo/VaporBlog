@@ -1,17 +1,21 @@
 import Fluent
 import Vapor
+import Smtp
 
 struct AuthController: RouteCollection {
     func boot(routes: any RoutesBuilder) throws {
 
         // 这个路由名符合 restful api 规范么？
         let authRoutes = routes.grouped("auth")
-
         authRoutes.post("register", use: register)
         authRoutes.post("login", use: login)
         // authRoutes.post("resetpwd", use: resetPwd)
+        // 账号激活
+        authRoutes.get("activate", use: activate)
 
         // 需要登录才能进行访问
+        // 重新发送激活邮件
+        //authRoutes.post("resend", use: resend)
         // authRoutes.post("logout", use: logout)
         // authRoutes.post("refresh", use: refresh)
         // authRoutes.post("changepwd", use: changePwd)
@@ -49,13 +53,33 @@ struct AuthController: RouteCollection {
             let code = try generateActivationCode(userId: user.requireID(), email: input.email)
             let expiredAt = Date().addingTimeInterval(30 * 60)  // 30分钟有效
             let verify =  EmailVerifyCode(
-                email: input.email, code: code, type: EmailVerifyCode.VerifyType.activation,
+                email: input.email, 
+                code: code, 
+                type: EmailVerifyCode.VerifyType.activation,
                 expiredAt: expiredAt
             )
             try await verify.create(on: db)
 
-            // 发送邮件
             
+
+            let link = Environment.get("SITE_DOMAIN") ?? "http://localhost:8080" + "/api/v1/auth/activate?token=\(code)"
+
+            // 发送邮件
+            let html = """
+            <html>
+            <body>
+                请点击此链接激活：<a href='\(link)'>\(link)</a>
+            </body>
+            </html>
+            """
+            let email = try Email(
+                from: EmailAddress(address: "13576051334@163.com"),
+                to: [EmailAddress(address: input.email)],
+                subject: "【VaporBlog】 账号激活",
+                body: html, 
+                isBodyHtml: true)
+            
+            try await req.smtp.send(email)
 
             // 创建 token
             let result = try await generateAuthTokens(for: user, on: db, req: req)
@@ -93,37 +117,38 @@ struct AuthController: RouteCollection {
     }
 
     // 生成验证邮件的 token
-
     func activate(req: Request) async throws -> APIResponse<OutEmpty> {
-        struct Input: Content {
-            let email: String
-            let code: String
-        }
-        let input = try req.content.decode(Input.self)
+        let input = try req.query.decode(InActive.self)
         // 校验激活码
         guard
             let verify = try await EmailVerifyCode.query(on: req.db)
-                .filter(\.$email == input.email)
-                .filter(\.$code == input.code)
-                .filter(\.$type == "activation")
+                .filter(\.$code == input.token)
+                .filter(\.$type == EmailVerifyCode.VerifyType.activation.rawValue)
                 .filter(\.$expiredAt > Date())
                 .first()
         else {
             throw APIError.custom(code: 601, msg: "激活码无效或已过期")
         }
-        // 查找用户并激活
-        guard
-            let user = try await User.query(on: req.db)
-                .filter(\.$nickname == input.email)
-                .first()
-        else {
-            throw APIError.notFound(msg: "用户不存在")
+
+        guard let userAuth = try await UserAuth.query(on: req.db)
+            .filter(\.$identifier == verify.email)
+            .filter(\.$authType == UserAuth.AuthType.email.rawValue)
+            .with(\.$user)
+            .first() else {
+                throw APIError.custom(code: 602, msg: "用户不存在")
         }
-        user.status = User.Status.active.rawValue
-        try await user.save(on: req.db)
+        
+        guard userAuth.user.status == User.Status.inactive.rawValue else  {
+            throw APIError.custom(code: 603, msg: "用户已激活")
+        }
+
+        // 设置为激活状态
+        userAuth.user.status = User.Status.active.rawValue
+        try await userAuth.user.save(on: req.db)
         try await verify.delete(on: req.db)
         return APIResponse(success: OutEmpty())
     }
+
 
     /// 生成激活码：用户id + 邮箱 + 时间戳，md5
     func generateActivationCode(userId: UUID, email: String) -> String {

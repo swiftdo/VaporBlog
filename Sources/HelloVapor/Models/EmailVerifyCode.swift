@@ -19,11 +19,12 @@ final class EmailVerifyCode: Model, Content, @unchecked Sendable {
     @Field(key: FieldKeys.expiredAt)
     var expiredAt: Date
 
-    @Field(key: FieldKeys.createdAt)
-    var createdAt: Date
+     @Timestamp(key: FieldKeys.createdAt, on: .create)
+    var createdAt: Date?
 
-    @Field(key: FieldKeys.updatedAt)
-    var updatedAt: Date
+    /// 更新时间戳，`on: .update` 表示在更新记录时自动设置。
+    @Timestamp(key: FieldKeys.updatedAt, on: .update)
+    var updatedAt: Date?
 
     init() {}
 
