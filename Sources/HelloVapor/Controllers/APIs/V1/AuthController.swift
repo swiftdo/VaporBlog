@@ -9,9 +9,11 @@ struct AuthController: RouteCollection {
         authRoutes.post("register", use: register)
         authRoutes.post("login", use: login)
         authRoutes.post("refreshToken", use: refreshToken)
-        // authRoutes.post("resetpwd", use: resetPwd)
+        authRoutes.post("resetpwd", use: resetPwd)
         // 账号激活
         authRoutes.get("activate", use: activate)
+        // 获取重置密码验证码
+        authRoutes.post("resetpwd", "code", use: sendResetPwdCode)
 
 
         // 需要登录才能进行访问
@@ -26,6 +28,78 @@ struct AuthController: RouteCollection {
         secure.post("changepwd", use: changePwd)
 
     }
+
+    func resetPwd(req: Request) async throws -> APIResponse<OutEmpty> { 
+        let input = try req.content.decode(InResetPwd.self)
+
+        guard let userAuth = try await UserAuth.query(on: req.db)
+            .filter(\.$identifier == input.email)
+            .filter(\.$authType == UserAuth.AuthType.email.rawValue)
+            .first()
+        else {
+            throw APIError.notFound(msg: "用户不存在")
+        }
+
+        // 找到邮件对应的验证码
+        let allCodes = try await EmailVerifyCode.query(on: req.db)
+            .filter(\.$email == input.email)
+            .filter(\.$type == EmailVerifyCode.VerifyType.resetPassword.rawValue)
+            .filter(\.$code == input.code)
+            .all()
+
+        let index = allCodes.firstIndex { verifyCode in
+            return verifyCode.expiredAt > Date() && verifyCode.code == input.code
+        }
+
+        guard let index = index , index >= 0 else {
+            throw APIError.notFound(msg: "验证码错误")
+        }
+
+        let verifyCode = allCodes[index]
+        userAuth.credential = try Bcrypt.hash(input.newPwd)
+
+        // 开启事务
+        try await req.db.transaction { db in
+            try await userAuth.save(on: db)
+            try await verifyCode.delete(on: db)
+        }
+        return APIResponse(data: OutEmpty())
+    }
+
+
+    func sendResetPwdCode(req: Request) async throws -> APIResponse<OutEmpty> { 
+        let input = try req.content.decode(InResetPwdCode.self)
+        // 发送邮件
+        guard let userAuth = try await UserAuth.query(on: req.db)
+            .filter(\.$identifier == input.email)
+            .filter(\.$authType == UserAuth.AuthType.email.rawValue)
+            .first()
+        else {
+            throw APIError.notFound(msg: "用户不存在")
+        }
+
+        // 生成验证码，6 位
+        let code = String(Int.random(in: 100000...999999))
+        let email = userAuth.identifier
+
+        let expiredAt = Date().addingTimeInterval(30 * 60)  // 30分钟有效
+        let verifyCode = EmailVerifyCode(email: email, code: code, type: EmailVerifyCode.VerifyType.resetPassword, expiredAt: expiredAt)
+        try await verifyCode.save(on: req.db)
+
+
+        // 发送邮件
+        let html = """
+        <html>
+        <body>
+            重置密码的验证码：\(code)
+        </body>
+        </html>
+        """
+        try await req.sendEmail(subject: "【VaporBlog】 重置密码", body: html, to: email, isBodyHtml: true)
+        return .init(success: OutEmpty())
+    }
+
+
 
     func changePwd(req: Request) async throws -> APIResponse<OutEmpty> { 
         let userPayload = try req.auth.require(UserPayload.self)
@@ -247,8 +321,11 @@ struct AuthController: RouteCollection {
 
         // 设置为激活状态
         userAuth.user.status = User.Status.active.rawValue
-        try await userAuth.user.save(on: req.db)
-        try await verify.delete(on: req.db)
+
+        try await req.db.transaction { db in
+            try await userAuth.user.save(on: db)
+            try await verify.delete(on: db)
+        }
         return APIResponse(success: OutEmpty())
     }
 
