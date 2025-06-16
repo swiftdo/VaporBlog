@@ -44,6 +44,9 @@ struct PostPageController: RouteCollection {
     }
 
 
+    
+
+
     // 列表页
     func indexPage(req: Request) async throws -> View {
         let posts = try await Post.query(on: req.db).sort(\.$createdAt, .descending).all()
