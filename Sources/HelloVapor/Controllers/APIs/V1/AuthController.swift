@@ -23,8 +23,35 @@ struct AuthController: RouteCollection {
         secure.post("resend", use: resend)
         // authRoutes.post("logout", use: logout)
         // authRoutes.post("refresh", use: refresh)
-        // authRoutes.post("changepwd", use: changePwd)
+        secure.post("changepwd", use: changePwd)
 
+    }
+
+    func changePwd(req: Request) async throws -> APIResponse<OutEmpty> { 
+        let userPayload = try req.auth.require(UserPayload.self)
+        guard let user = try await User.find(userPayload.userId, on: req.db) else {
+            throw APIError.notFound(msg: "用户不存在")
+        }
+
+        let inChangePwd = try req.content.decode(InChangePwd.self)
+
+        // 判断新旧密码是否一致
+        guard let userAuth = try await UserAuth.query(on: req.db)
+            .filter(\.$user.$id == user.requireID())
+            .filter(\.$authType == UserAuth.AuthType.email.rawValue)
+            .first()
+        else {
+            throw APIError.notFound(msg: "用户不存在")
+        }
+
+        guard let credential = userAuth.credential,
+            try Bcrypt.verify(inChangePwd.oldPwd, created: credential)
+        else {
+            throw APIError.custom(code: 603, msg: "账号或密码错误")
+        }
+        userAuth.credential = try Bcrypt.hash(inChangePwd.newPwd)
+        try await userAuth.save(on: req.db)
+        return APIResponse(success: OutEmpty())
     }
 
     func resend(req: Request) async throws -> APIResponse<OutEmpty> {
