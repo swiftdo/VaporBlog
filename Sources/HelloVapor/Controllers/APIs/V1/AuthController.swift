@@ -9,17 +9,78 @@ struct AuthController: RouteCollection {
         let authRoutes = routes.grouped("auth")
         authRoutes.post("register", use: register)
         authRoutes.post("login", use: login)
+        authRoutes.post("refreshToken", use: refreshToken)
         // authRoutes.post("resetpwd", use: resetPwd)
         // 账号激活
         authRoutes.get("activate", use: activate)
 
+
         // 需要登录才能进行访问
+        let secure = authRoutes.grouped(UserPayload.authenticator(), UserPayload.guardMiddleware())
+        secure.get("me", use: me)
+
+        secure.post("logout", use: logout)
         // 重新发送激活邮件
         //authRoutes.post("resend", use: resend)
         // authRoutes.post("logout", use: logout)
         // authRoutes.post("refresh", use: refresh)
         // authRoutes.post("changepwd", use: changePwd)
 
+    }
+
+    func refreshToken(req: Request) async throws -> APIResponse<OutLogin> { 
+
+        let input = try req.content.decode(InRefreshToken.self)
+
+        guard
+            let refreshToken = try await RefreshToken.query(on: req.db)
+                .with(\.$user)
+                .filter(\.$token == input.refreshToken)
+                .first()
+        else {
+            throw APIError.notFound(msg: "无效的刷新令牌")
+        }
+
+        if refreshToken.expiresAt < Date() {
+            try await refreshToken.delete(on: req.db)
+            throw APIError.custom(code: 600, msg: "刷新令牌已过期")
+        }
+
+        // 获取用户
+        let user = refreshToken.user 
+
+        if user.status != User.Status.active.rawValue {
+            // 清除所有该用户的刷新令牌
+            try await RefreshToken.query(on: req.db)
+                .filter(\.$user.$id == user.requireID())
+                .delete()
+            throw APIError.custom(code: 601, msg: "用户状态非法，不允许修改")
+        }
+
+        // 删除旧的 refresh token
+        try await refreshToken.delete(on: req.db)
+
+        let result = try await generateAuthTokens(for: user, on: req.db, req: req)
+        return APIResponse(success: result)
+    }
+
+
+    func logout(req: Request) async throws -> APIResponse<OutEmpty> {
+        let userPayload = try req.auth.require(UserPayload.self)
+
+        // 删除刷新 token
+        try await RefreshToken.query(on: req.db)
+            .filter(\.$user.$id == userPayload.userId)
+            .delete()
+        return APIResponse(success: OutEmpty())
+    }
+
+    func me(req: Request) async throws -> APIResponse<OutUser> {
+        let userPayload = try req.auth.require(UserPayload.self)
+        guard let user = try await User.find(userPayload.userId, on: req.db) else {
+            throw APIError.notFound(msg: "用户不存在")
+        }
+        return APIResponse(success: OutUser(user: user))
     }
 
     // 用户注册
@@ -59,8 +120,6 @@ struct AuthController: RouteCollection {
                 expiredAt: expiredAt
             )
             try await verify.create(on: db)
-
-            
 
             let link = Environment.get("SITE_DOMAIN") ?? "http://localhost:8080" + "/api/v1/auth/activate?token=\(code)"
 

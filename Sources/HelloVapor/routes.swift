@@ -21,6 +21,7 @@ func routes(_ app: Application) throws {
         try api.group("v1") { v1 in
             try v1.register(collection: PostController())
             try v1.register(collection: AuthController())
+            try v1.register(collection: UserController())
         }
     }
 

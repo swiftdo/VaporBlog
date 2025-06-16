@@ -21,10 +21,6 @@ struct PostController: RouteCollection {
         }
     }
 
-
-
-
-
     // 看所有文章
     func index(req: Request) async throws -> APIResponse<[OutPost]> {
         let posts = try await Post.query(on: req.db).all()
