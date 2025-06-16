@@ -1,6 +1,5 @@
 import Fluent
 import Vapor
-import Smtp
 
 struct AuthController: RouteCollection {
     func boot(routes: any RoutesBuilder) throws {
@@ -21,11 +20,57 @@ struct AuthController: RouteCollection {
 
         secure.post("logout", use: logout)
         // 重新发送激活邮件
-        //authRoutes.post("resend", use: resend)
+        secure.post("resend", use: resend)
         // authRoutes.post("logout", use: logout)
         // authRoutes.post("refresh", use: refresh)
         // authRoutes.post("changepwd", use: changePwd)
 
+    }
+
+    func resend(req: Request) async throws -> APIResponse<OutEmpty> {
+        let userPayload = try req.auth.require(UserPayload.self)
+        guard let user = try await User.find(userPayload.userId, on: req.db) else {
+            throw APIError.notFound(msg: "用户不存在")
+        }
+        guard user.status == User.Status.inactive.rawValue else {
+            throw APIError.custom(code: 600, msg: "用户已激活，无需发送")
+        }
+        // TODO: 控制发送频次，可自行实现
+        // 删除这个用户已发送的激活码 
+        guard let userAuth = try await UserAuth.query(on: req.db)
+            .filter(\.$user.$id == user.requireID())
+            .filter(\.$authType == UserAuth.AuthType.email.rawValue)
+            .first()
+        else {
+            throw APIError.notFound(msg: "用户不存在")
+        }
+        // 发送邮件
+        try await sendActiveEmail(userId: user.requireID(), email: userAuth.identifier, db: req.db, req: req)
+        return APIResponse(success: OutEmpty())
+    }
+
+    private func sendActiveEmail(userId: UUID, email:String, db: any Database, req: Request) async throws -> Void {
+        let code = generateActivationCode(userId: userId, email: email)
+        let expiredAt = Date().addingTimeInterval(30 * 60)  // 30分钟有效
+        let verify =  EmailVerifyCode(
+            email: email, 
+            code: code, 
+            type: EmailVerifyCode.VerifyType.activation,
+            expiredAt: expiredAt
+        )
+        try await verify.create(on: db)
+
+        
+        let link = (Environment.get("SITE_DOMAIN") ?? "http://localhost:8080") + "/api/v1/auth/activate?token=\(code)"
+        // 发送邮件
+        let html = """
+        <html>
+        <body>
+            请点击此链接激活：<a href='\(link)'>\(link)</a>
+        </body>
+        </html>
+        """
+        try await req.sendEmail(subject: "【VaporBlog】 账号激活", body: html, to: email, isBodyHtml: true)
     }
 
     func refreshToken(req: Request) async throws -> APIResponse<OutLogin> { 
@@ -54,7 +99,7 @@ struct AuthController: RouteCollection {
             try await RefreshToken.query(on: req.db)
                 .filter(\.$user.$id == user.requireID())
                 .delete()
-            throw APIError.custom(code: 601, msg: "用户状态非法，不允许修改")
+            throw APIError.custom(code: 601, msg: "用户状态非激活状态，不允许修改")
         }
 
         // 删除旧的 refresh token
@@ -111,35 +156,7 @@ struct AuthController: RouteCollection {
             try await auth.create(on: db)
 
             // 生成激活码
-            let code = try generateActivationCode(userId: user.requireID(), email: input.email)
-            let expiredAt = Date().addingTimeInterval(30 * 60)  // 30分钟有效
-            let verify =  EmailVerifyCode(
-                email: input.email, 
-                code: code, 
-                type: EmailVerifyCode.VerifyType.activation,
-                expiredAt: expiredAt
-            )
-            try await verify.create(on: db)
-
-            let link = Environment.get("SITE_DOMAIN") ?? "http://localhost:8080" + "/api/v1/auth/activate?token=\(code)"
-
-            // 发送邮件
-            let html = """
-            <html>
-            <body>
-                请点击此链接激活：<a href='\(link)'>\(link)</a>
-            </body>
-            </html>
-            """
-            let email = try Email(
-                from: EmailAddress(address: "13576051334@163.com"),
-                to: [EmailAddress(address: input.email)],
-                subject: "【VaporBlog】 账号激活",
-                body: html, 
-                isBodyHtml: true)
-            
-            try await req.smtp.send(email)
-
+            try await sendActiveEmail(userId: user.requireID(), email: input.email, db: db, req: req)
             // 创建 token
             let result = try await generateAuthTokens(for: user, on: db, req: req)
             return APIResponse(success: result)
