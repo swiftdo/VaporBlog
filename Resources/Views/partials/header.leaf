@@ -8,6 +8,8 @@
             <li class="nav-item">
                 <a class="nav-link" href="/">关于我们</a>
             </li>
+
+            #if(user):
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="userMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     用户名
@@ -18,6 +20,114 @@
                     <li><a class="dropdown-item" href="/logout">退出登录</a></li>
                 </ul>
             </li>
+            #else: 
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#loginModal">登录/注册</a>
+            </li>
+            #endif
         </ul>
     </div>
 </header>
+
+<!-- 登录/注册弹窗 -->
+<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg rounded-2 p-4" style="background:rgba(255,255,255,0.96);">
+      <div class="modal-header border-0 pb-0">
+        <h4 class="modal-title w-100 text-center fw-bold" id="loginModalLabel"
+            style="font-size:2rem;letter-spacing:2px;background: linear-gradient(90deg,#4f8cff,#38cfa6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">
+          欢迎来到 VaporBlog
+        </h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="关闭"></button>
+      </div>
+      <div class="modal-body pt-4 px-4">
+        <!-- 登录表单 -->
+        <form id="loginForm" class="fade-in" method="post" action="/page/auth/login">
+            <div class="mb-4">
+                <input type="email" name="email" class="form-control form-control-lg rounded-pill" id="loginEmail" placeholder="邮箱" required>
+            </div>
+            <div class="mb-4">
+                <input type="password" name="password" class="form-control form-control-lg rounded-pill" id="loginPassword" placeholder="密码" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-lg w-100 rounded-pill shadow" style="background:linear-gradient(90deg,#4f8cff,#38cfa6);border:0;">登录</button>
+            <div class="text-center mt-4">
+                <a href="#" id="showRegisterForm" class="switch-link">没有账号？<b>去注册</b></a>
+            </div>
+        </form>
+        <!-- 注册表单（初始隐藏） -->
+        <form id="registerForm" style="display:none;" class="fade-in">
+            <div class="mb-4">
+                <input type="email" class="form-control form-control-lg rounded-pill" id="registerEmail" placeholder="邮箱" required>
+            </div>
+            <div class="mb-4">
+                <input type="password" class="form-control form-control-lg rounded-pill" id="registerPassword" placeholder="密码" required>
+            </div>
+            <button type="submit" class="btn btn-success btn-lg w-100 rounded-pill shadow" style="background:linear-gradient(90deg,#38cfa6,#4f8cff);border:0;">注册</button>
+            <div class="text-center mt-4">
+                <a href="#" id="showLoginForm" class="switch-link">已有账号？<b>去登录</b></a>
+            </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.modal-content {
+  border-radius: 2rem;
+  box-shadow: 0 12px 48px rgba(0,0,0,0.15);
+  border: none;
+  background: rgba(255,255,255,0.96);
+}
+.fade-in {
+  animation: fadeInUp 0.5s;
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(40px);}
+  to { opacity: 1; transform: translateY(0);}
+}
+.form-control {
+  font-size: 1.15rem;
+  padding: 0.9rem 1.2rem;
+  background: #fff;
+  border: 1.5px solid #e3eaf2;
+  transition: box-shadow 0.2s, border-color 0.2s;
+  box-shadow: none;
+  text-align: left;
+}
+.form-control::placeholder {
+  color: #b0b8c9;
+  opacity: 1;
+}
+.form-control:focus {
+  box-shadow: 0 0 0 0.18rem #4f8cff33;
+  border-color: #4f8cff;
+  background: #fff;
+}
+.btn:focus {
+  box-shadow: 0 0 0 0.18rem #38cfa633;
+}
+.switch-link {
+  color: #4f8cff;
+  font-weight: 500;
+  transition: color 0.2s;
+  text-decoration: none;
+}
+.switch-link:hover {
+  color: #38cfa6;
+  text-decoration: underline;
+}
+</style>
+
+<script>
+document.getElementById('showRegisterForm').onclick = function(e) {
+  e.preventDefault();
+  document.getElementById('loginForm').style.display = 'none';
+  document.getElementById('registerForm').style.display = '';
+};
+document.getElementById('showLoginForm').onclick = function(e) {
+  e.preventDefault();
+  document.getElementById('registerForm').style.display = 'none';
+  document.getElementById('loginForm').style.display = '';
+};
+</script>

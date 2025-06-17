@@ -12,8 +12,7 @@ struct UserController: RouteCollection {
             user.get(use: show)
         }
     }
-
-
+    
     // 获取到用户信息
     private func show(req: Request) async throws -> APIResponse<OutUser> {
        guard let user = try await User.find(req.parameters.get("userId"), on: req.db) else {

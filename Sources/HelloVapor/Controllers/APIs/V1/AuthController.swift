@@ -1,7 +1,14 @@
 import Fluent
 import Vapor
 
-struct AuthController: RouteCollection {
+struct AuthController: RouteCollection, @unchecked Sendable {
+
+    let authService: any AuthService
+
+    init(authService: any AuthService) {
+        self.authService = authService
+    }
+
     func boot(routes: any RoutesBuilder) throws {
 
         // 这个路由名符合 restful api 规范么？
@@ -175,38 +182,8 @@ struct AuthController: RouteCollection {
     }
 
     func refreshToken(req: Request) async throws -> APIResponse<OutLogin> { 
-
         let input = try req.content.decode(InRefreshToken.self)
-
-        guard
-            let refreshToken = try await RefreshToken.query(on: req.db)
-                .with(\.$user)
-                .filter(\.$token == input.refreshToken)
-                .first()
-        else {
-            throw APIError.notFound(msg: "无效的刷新令牌")
-        }
-
-        if refreshToken.expiresAt < Date() {
-            try await refreshToken.delete(on: req.db)
-            throw APIError.custom(code: 600, msg: "刷新令牌已过期")
-        }
-
-        // 获取用户
-        let user = refreshToken.user 
-
-        if user.status != User.Status.active.rawValue {
-            // 清除所有该用户的刷新令牌
-            try await RefreshToken.query(on: req.db)
-                .filter(\.$user.$id == user.requireID())
-                .delete()
-            throw APIError.custom(code: 601, msg: "用户状态非激活状态，不允许修改")
-        }
-
-        // 删除旧的 refresh token
-        try await refreshToken.delete(on: req.db)
-
-        let result = try await generateAuthTokens(for: user, on: req.db, req: req)
+        let result = try await authService.refreshToken(input: input, request: req)
         return APIResponse(success: result)
     }
 
@@ -232,34 +209,9 @@ struct AuthController: RouteCollection {
     // 用户注册
     func register(req: Request) async throws -> APIResponse<OutLogin> {
         let input = try req.content.decode(InRegister.self)
-
         return try await req.db.transaction { db in
-            let userAuth = try await UserAuth.query(on: db)
-                .filter(\.$authType == UserAuth.AuthType.email.rawValue)
-                .filter(\.$identifier == input.email)
-                .first()
-
-            if userAuth != nil {
-                throw APIError.alreadyExists(msg: "邮箱已被注册")
-            }
-
-            // 创建用户
-            let user = User(nickname: input.email)
-            try await user.create(on: db)
-
-            // 创建认证记录
-            let auth = UserAuth(
-                userID: try user.requireID(),
-                authType: .email,
-                identifier: input.email,
-                credential: try Bcrypt.hash(input.password)
-            )
-            try await auth.create(on: db)
-
-            // 生成激活码
-            try await sendActiveEmail(userId: user.requireID(), email: input.email, db: db, req: req)
             // 创建 token
-            let result = try await generateAuthTokens(for: user, on: db, req: req)
+            let result = try await authService.register(input: input, db: db, request: req)
             return APIResponse(success: result)
         }
     }
@@ -267,29 +219,7 @@ struct AuthController: RouteCollection {
     // 用户登录
     func login(req: Request) async throws -> APIResponse<OutLogin> {
         let input = try req.content.decode(InLogin.self)
-        // 查找认证记录
-        guard
-            let auth = try await UserAuth.query(on: req.db)
-                .filter(\.$authType == UserAuth.AuthType.email.rawValue)
-                .filter(\.$identifier == input.email)
-                .first(),
-            let user = try await User.find(auth.$user.id, on: req.db)
-        else {
-            throw APIError.custom(code: 600, msg: "账号或密码错误")
-        }
-
-        // 检查用户是否被禁用
-        if user.status == User.Status.banned.rawValue {
-            throw APIError.custom(code: 602, msg: "账号已被禁用，请联系管理员")
-        }
-
-        // 验证密码
-        guard let credential = auth.credential,
-            try Bcrypt.verify(input.password, created: credential)
-        else {
-            throw APIError.custom(code: 603, msg: "账号或密码错误")
-        }
-        let result = try await generateAuthTokens(for: user, on: req.db, req: req)
+        let result = try await authService.login(input: input, request: req);
         return APIResponse(success: result)
     }
 
@@ -337,24 +267,6 @@ struct AuthController: RouteCollection {
         let digest = Insecure.MD5.hash(data: raw.data(using: .utf8)!)
         return digest.map { String(format: "%02hhx", $0) }.joined()
     }
-
-    // 生成认证令牌
-    private func generateAuthTokens(for user: User, on db: any Database, req: Request) async throws
-        -> OutLogin
-    {
-        let payload = UserPayload(userId: try user.requireID())
-        let token = try await req.jwt.sign(payload)
-
-        let refreshToken = RefreshToken(
-            token: [UInt8].random(count: 32).base64,
-            userID: try user.requireID(),
-            expiresAt: Date().addingTimeInterval(3600 * 24 * 30)
-        )
-        try await refreshToken.create(on: db)
-        return OutLogin(
-            token: token,
-            refreshToken: refreshToken.token,
-            user: OutUser(user: user)
-        )
-    }
 }
+
+

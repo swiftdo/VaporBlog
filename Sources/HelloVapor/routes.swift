@@ -16,11 +16,13 @@ func routes(_ app: Application) throws {
         return "Email sent."
     }
 
+    let authService: any AuthService = AuthServiceImpl()
+
     // MARK-API控制器
     try app.group("api") { api in
         try api.group("v1") { v1 in
             try v1.register(collection: PostController())
-            try v1.register(collection: AuthController())
+            try v1.register(collection: AuthController(authService: authService))
             try v1.register(collection: UserController())
         }
     }
@@ -28,6 +30,7 @@ func routes(_ app: Application) throws {
     // MARK-页面控制器
     try app.group("page") { page in
         try page.register(collection: PostPageController())
+        try page.register(collection: AuthPageController(authService: authService))
     }
 
 }

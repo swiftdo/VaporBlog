@@ -5,9 +5,6 @@ protocol EmailService: Sendable {
     func send(subject: String, body: String, to email: String, isBodyHtml: Bool, on request: Request) async throws
 }
 
-
-
-
 struct EmailServiceKey: StorageKey {
     typealias Value = EmailService
 }

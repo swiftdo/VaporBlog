@@ -1,7 +1,7 @@
 import Vapor
 struct PostPageController: RouteCollection {
     func boot(routes: any RoutesBuilder) throws {
-        let posts = routes.grouped("posts")
+        let posts = routes.grouped("posts").grouped(UserAuthenticatorMiddleware())
         
         // GET 请求：页面展示
         posts.get(use: indexPage)                // 列表页面
@@ -43,14 +43,21 @@ struct PostPageController: RouteCollection {
         return req.redirect(to: "/page/posts")
     }
 
-
-    
-
-
     // 列表页
     func indexPage(req: Request) async throws -> View {
+        let payload = req.auth.get(UserPayload.self)
         let posts = try await Post.query(on: req.db).sort(\.$createdAt, .descending).all()
-        return try await req.view.render("posts/index", ["posts": posts])
+
+        var context: [String: AnyEncodable] = [
+            "posts": AnyEncodable(value: posts.map { OutPost(from: $0) }),
+        ]
+        var user: OutUser? 
+        if let payload, let dbuser = try await User.find(payload.userId, on: req.db) {
+            user = OutUser(user: dbuser)
+            context["user"] = AnyEncodable(value: user)
+        }
+        
+        return try await req.view.render("posts/index", context)
     }
 
     // 创建页
