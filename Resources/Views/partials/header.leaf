@@ -16,7 +16,7 @@
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
                   <li>
-                      <a class="dropdown-item" href="/admin/profile">个人资料</a>
+                      <a class="dropdown-item" href="/page/users/profile">个人资料</a>
                   </li>
                   <li><hr class="dropdown-divider"></li>
                   <li>
@@ -63,10 +63,10 @@
         <!-- 注册表单（初始隐藏） -->
         <form id="registerForm" style="display:none;" class="fade-in" method="post" action="/page/auth/register">
             <div class="mb-4">
-                <input type="email" class="form-control form-control-lg rounded-pill" id="registerEmail" placeholder="邮箱" required>
+                <input type="email" name="email" class="form-control form-control-lg rounded-pill" id="registerEmail" placeholder="邮箱" required>
             </div>
             <div class="mb-4">
-                <input type="password" class="form-control form-control-lg rounded-pill" id="registerPassword" placeholder="密码" required>
+                <input type="password" name="password" class="form-control form-control-lg rounded-pill" id="registerPassword" placeholder="密码" required>
             </div>
             <button type="submit" class="btn btn-success btn-lg w-100 rounded-pill shadow" style="background:linear-gradient(90deg,#38cfa6,#4f8cff);border:0;">注册</button>
             <div class="text-center mt-4">

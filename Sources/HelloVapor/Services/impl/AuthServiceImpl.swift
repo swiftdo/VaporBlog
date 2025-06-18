@@ -3,6 +3,39 @@ import Fluent
 
 final class AuthServiceImpl: AuthService {
 
+    func activate(input: InActive, request: Request) async throws {
+        // 校验激活码
+        guard
+            let verify = try await EmailVerifyCode.query(on: request.db)
+                .filter(\.$code == input.token)
+                .filter(\.$type == EmailVerifyCode.VerifyType.activation.rawValue)
+                .filter(\.$expiredAt > Date())
+                .first()
+        else {
+            throw APIError.custom(code: 601, msg: "激活码无效或已过期")
+        }
+
+        guard let userAuth = try await UserAuth.query(on: request.db)
+            .filter(\.$identifier == verify.email)
+            .filter(\.$authType == UserAuth.AuthType.email.rawValue)
+            .with(\.$user)
+            .first() else {
+                throw APIError.custom(code: 602, msg: "用户不存在")
+        }
+        
+        guard userAuth.user.status == User.Status.inactive.rawValue else  {
+            throw APIError.custom(code: 603, msg: "用户已激活")
+        }
+
+        // 设置为激活状态
+        userAuth.user.status = User.Status.active.rawValue
+
+        try await request.db.transaction { db in
+            try await userAuth.user.save(on: db)
+            try await verify.delete(on: db)
+        }
+    }
+
     func logout(request: Request) async throws {
         let userPayload = try request.auth.require(UserPayload.self)
 
@@ -70,7 +103,7 @@ final class AuthServiceImpl: AuthService {
         return try await generateAuthTokens(for: user, on: request.db, req: request)
     }
 
-    func register(input: InRegister, db: any Database, request: Request) async throws -> OutLogin {
+    func register(input: InRegister, activePath: String, db: any Database, request: Request) async throws -> OutLogin {
         let userAuth = try await UserAuth.query(on: db)
             .filter(\.$authType == UserAuth.AuthType.email.rawValue)
             .filter(\.$identifier == input.email)
@@ -94,7 +127,7 @@ final class AuthServiceImpl: AuthService {
         try await auth.create(on: db)
 
         // 生成激活码
-        try await sendActiveEmail(userId: user.requireID(), email: input.email, db: db, req: request)
+        try await sendActiveEmail(userId: user.requireID(), activePath: activePath, email: input.email, db: db, req: request)
         // 创建 token
         return try await generateAuthTokens(for: user, on: db, req: request)
     }
@@ -119,7 +152,7 @@ final class AuthServiceImpl: AuthService {
         )
     }
 
-    private func sendActiveEmail(userId: UUID, email:String, db: any Database, req: Request) async throws -> Void {
+    private func sendActiveEmail(userId: UUID, activePath: String, email:String, db: any Database, req: Request) async throws -> Void {
         let code = generateActivationCode(userId: userId, email: email)
         let expiredAt = Date().addingTimeInterval(30 * 60)  // 30分钟有效
         let verify =  EmailVerifyCode(
@@ -131,7 +164,7 @@ final class AuthServiceImpl: AuthService {
         try await verify.create(on: db)
 
         
-        let link = (Environment.get("SITE_DOMAIN") ?? "http://localhost:8080") + "/api/v1/auth/activate?token=\(code)"
+        let link = Environment.SITE_DOMAIN() + "\(activePath)?token=\(code)"
         // 发送邮件
         let html = """
         <html>

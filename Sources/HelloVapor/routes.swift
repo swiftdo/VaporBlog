@@ -31,6 +31,7 @@ func routes(_ app: Application) throws {
     try app.grouped(app.sessions.middleware).group("page") { page in
         try page.register(collection: PostPageController())
         try page.register(collection: AuthPageController(authService: authService))
+        try page.register(collection: UserPageController())
     }
 
 }

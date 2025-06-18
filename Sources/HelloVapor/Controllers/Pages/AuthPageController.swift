@@ -12,8 +12,18 @@ struct AuthPageController: RouteCollection, @unchecked Sendable {
         let secure = auth.grouped(UserAuthenticatorMiddleware())
 
         auth.post("login", use: login)
+        auth.get("activate", use: activate)
         auth.post("register", use: register)
+
+        // 需要登录
         secure.post("logout", use: logout)
+    }
+
+    private func activate(req: Request) async throws -> Response {
+        let input = try req.query.decode(InActive.self)
+        try await authService.activate(input: input, request: req)
+        try req.flash(.success, message: "激活成功")
+        return req.redirect(to: "/page/posts/")
     }
 
     private func logout(req: Request) async throws -> Response {
@@ -29,9 +39,10 @@ struct AuthPageController: RouteCollection, @unchecked Sendable {
     private func register(req: Request) async throws -> Response {
         let input = try req.content.decode(InRegister.self)
         let result = try await req.db.transaction { db in
-            return try await authService.register(input: input, db: db, request: req)
+            return try await authService.register(input: input, activePath: "/page/auth/activate", db: db, request: req)
         }
         // 返回到首页
+        try req.flash(.success, message: "注册成功，已发送邮件到您邮箱，请前往邮箱激活账号")
         let response = req.redirect(to: "/page/posts/")
         // 设置 cookie
         setupCookie(result: result, response: response)

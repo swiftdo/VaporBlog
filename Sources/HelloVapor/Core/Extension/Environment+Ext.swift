@@ -17,4 +17,8 @@ extension Environment {
         }
         return 86400
     }
+
+    static func SITE_DOMAIN() -> String {
+        return Environment.get("SITE_DOMAIN") ?? "http://localhost:8080"
+    }
 }

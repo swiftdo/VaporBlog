@@ -1,0 +1,41 @@
+#extend("layouts/base"):
+
+#export("title"):
+个人资料
+#endexport
+#export("body"):
+    <div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+      <div class="card shadow rounded-4 border-0">
+        <div class="card-body p-5">
+          <div class="text-center mb-4">
+            <h4 class="mt-3 mb-1 fw-bold">个人资料</h4>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">昵称</label>
+            <div class="form-control-plaintext ps-2" style="font-size:1.15rem;">
+              #(user.nickname) 
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">状态</label>
+            <div class="form-control-plaintext ps-2" style="font-size:1.15rem;">
+              #(user.status) 
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.card {
+  border-radius: 2rem;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.10);
+}
+</style>
+#endexport
+
+#endextend

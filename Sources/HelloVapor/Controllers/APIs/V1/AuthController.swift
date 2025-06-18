@@ -206,7 +206,7 @@ struct AuthController: RouteCollection, @unchecked Sendable {
         let input = try req.content.decode(InRegister.self)
         return try await req.db.transaction { db in
             // 创建 token
-            let result = try await authService.register(input: input, db: db, request: req)
+            let result = try await authService.register(input: input, activePath: "/api/v1/auth/activate",db: db, request: req)
             return APIResponse(success: result)
         }
     }
@@ -221,36 +221,7 @@ struct AuthController: RouteCollection, @unchecked Sendable {
     // 生成验证邮件的 token
     func activate(req: Request) async throws -> APIResponse<OutEmpty> {
         let input = try req.query.decode(InActive.self)
-        // 校验激活码
-        guard
-            let verify = try await EmailVerifyCode.query(on: req.db)
-                .filter(\.$code == input.token)
-                .filter(\.$type == EmailVerifyCode.VerifyType.activation.rawValue)
-                .filter(\.$expiredAt > Date())
-                .first()
-        else {
-            throw APIError.custom(code: 601, msg: "激活码无效或已过期")
-        }
-
-        guard let userAuth = try await UserAuth.query(on: req.db)
-            .filter(\.$identifier == verify.email)
-            .filter(\.$authType == UserAuth.AuthType.email.rawValue)
-            .with(\.$user)
-            .first() else {
-                throw APIError.custom(code: 602, msg: "用户不存在")
-        }
-        
-        guard userAuth.user.status == User.Status.inactive.rawValue else  {
-            throw APIError.custom(code: 603, msg: "用户已激活")
-        }
-
-        // 设置为激活状态
-        userAuth.user.status = User.Status.active.rawValue
-
-        try await req.db.transaction { db in
-            try await userAuth.user.save(on: db)
-            try await verify.delete(on: db)
-        }
+        try await authService.activate(input: input, request: req)
         return APIResponse(success: OutEmpty())
     }
 
