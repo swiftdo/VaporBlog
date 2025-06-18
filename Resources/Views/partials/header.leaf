@@ -55,7 +55,7 @@
             </div>
         </form>
         <!-- 注册表单（初始隐藏） -->
-        <form id="registerForm" style="display:none;" class="fade-in">
+        <form id="registerForm" style="display:none;" class="fade-in" method="post" action="/page/auth/register">
             <div class="mb-4">
                 <input type="email" class="form-control form-control-lg rounded-pill" id="registerEmail" placeholder="邮箱" required>
             </div>

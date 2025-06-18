@@ -3,12 +3,15 @@ import Vapor
 import Fluent
 
 protocol AuthService {
-
+    /// 登录
+    /// - Parameters:
+    ///     - input: 登录参数
+    /// - Returns: OutLogin
     func login(input: InLogin, request: Request) async throws -> OutLogin
 
+    /// 注册
     func register(input: InRegister, db: any Database,  request: Request) async throws -> OutLogin
     
-
+    /// 刷新 token
     func refreshToken(input: InRefreshToken, request: Request) async throws -> OutLogin
-
 }
