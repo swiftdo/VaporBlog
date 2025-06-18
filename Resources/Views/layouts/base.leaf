@@ -8,8 +8,9 @@
 </head>
 <body class="d-flex flex-column min-vh-100">
     #extend("partials/header")
-
+    
     <main class="flex-fill">
+        #flash()
         #import("body")
     </main>
     #extend("partials/footer")

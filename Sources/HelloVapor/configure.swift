@@ -21,6 +21,7 @@ public func configure(_ app: Application) async throws {
 
     // MARK: - 注册 Leaf 模板引擎
     app.views.use(.leaf)
+    app.leaf.tags["flash"] = FlashTag()
     
     // MARK: - 注册数据库
     try databases(app)
