@@ -109,7 +109,7 @@ final class AuthServiceImpl: AuthService {
         let refreshToken = RefreshToken(
             token: [UInt8].random(count: 32).base64,
             userID: try user.requireID(),
-            expiresAt: Date().addingTimeInterval(3600 * 24 * 30)
+            expiresAt: Date().addingTimeInterval(Environment.REFRESH_TOKEN_EXPIRE())
         )
         try await refreshToken.create(on: db)
         return OutLogin(

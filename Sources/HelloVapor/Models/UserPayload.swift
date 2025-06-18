@@ -12,8 +12,7 @@ struct UserPayload: Authenticatable, JWTPayload {
 
     // 初始化方法
     init(userId: UUID) {
-        let expiration: TimeInterval = 3600 * 24 // 默认24小时有效期
-//        let expiration: TimeInterval = 60 * 1
+        let expiration: TimeInterval = Environment.ACCESS_TOKEN_EXPIRE() // 默认24小时有效期
         self.exp = .init(value: Date().addingTimeInterval(expiration))
         self.sub = .init(value: userId.uuidString)
         self.userId = userId

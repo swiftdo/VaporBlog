@@ -50,14 +50,14 @@ struct AuthPageController: RouteCollection, @unchecked Sendable {
     private func setupCookie(result: OutLogin, response: Response) {
         response.cookies["access_token"] = HTTPCookies.Value(
             string: result.token,
-            expires: Date().addingTimeInterval(3600),
+            expires: Date().addingTimeInterval(Environment.ACCESS_TOKEN_EXPIRE()),
             isSecure: true,
             isHTTPOnly: true,
         )
 
         response.cookies["refresh_token"] = HTTPCookies.Value(
             string: result.refreshToken,
-            expires: Date().addingTimeInterval(3600 * 24 * 30),
+            expires: Date().addingTimeInterval(Environment.REFRESH_TOKEN_EXPIRE()),
             isSecure: true,
             isHTTPOnly: true
         )
