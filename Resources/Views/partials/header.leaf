@@ -15,9 +15,15 @@
                     用户名
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
-                    <li><a class="dropdown-item" href="/admin/profile">个人资料</a></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item" href="/logout">退出登录</a></li>
+                  <li>
+                      <a class="dropdown-item" href="/admin/profile">个人资料</a>
+                  </li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li>
+                      <form action="/page/auth/logout" method="post">
+                          <button type="submit" class="dropdown-item">退出登录</button>
+                      </form>
+                  </li>
                 </ul>
             </li>
             #else: 

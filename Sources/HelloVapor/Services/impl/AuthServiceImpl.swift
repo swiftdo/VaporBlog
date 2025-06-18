@@ -3,6 +3,15 @@ import Fluent
 
 final class AuthServiceImpl: AuthService {
 
+    func logout(request: Request) async throws {
+        let userPayload = try request.auth.require(UserPayload.self)
+
+        // 删除刷新 token
+        try await RefreshToken.query(on: request.db)
+            .filter(\.$user.$id == userPayload.userId)
+            .delete()
+    }
+
     func refreshToken(input: InRefreshToken, request: Request) async throws -> OutLogin {
         let input = try request.content.decode(InRefreshToken.self)
 

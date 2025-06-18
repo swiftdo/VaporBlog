@@ -189,12 +189,7 @@ struct AuthController: RouteCollection, @unchecked Sendable {
 
 
     func logout(req: Request) async throws -> APIResponse<OutEmpty> {
-        let userPayload = try req.auth.require(UserPayload.self)
-
-        // 删除刷新 token
-        try await RefreshToken.query(on: req.db)
-            .filter(\.$user.$id == userPayload.userId)
-            .delete()
+        try await authService.logout(request: req)
         return APIResponse(success: OutEmpty())
     }
 

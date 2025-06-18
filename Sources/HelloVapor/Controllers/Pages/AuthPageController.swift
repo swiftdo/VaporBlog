@@ -9,8 +9,20 @@ struct AuthPageController: RouteCollection, @unchecked Sendable {
     func boot(routes: any RoutesBuilder) throws {
         let auth = routes.grouped("auth")
 
+        let secure = auth.grouped(UserAuthenticatorMiddleware())
+
         auth.post("login", use: login)
         auth.post("register", use: register)
+        secure.post("logout", use: logout)
+    }
+
+    private func logout(req: Request) async throws -> Response {
+        try await authService.logout(request: req)
+        let response = req.redirect(to: "/page/posts/")
+        // 删除 cookie
+        response.cookies["access_token"] = .expired
+        response.cookies["refresh_token"] = .expired
+        return response
     }
 
     private func register(req: Request) async throws -> Response {

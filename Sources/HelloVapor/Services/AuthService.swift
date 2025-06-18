@@ -14,4 +14,7 @@ protocol AuthService {
     
     /// 刷新 token
     func refreshToken(input: InRefreshToken, request: Request) async throws -> OutLogin
+
+    /// 登出
+    func logout(request: Request) async throws -> Void
 }
