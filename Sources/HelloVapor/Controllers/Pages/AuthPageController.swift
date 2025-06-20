@@ -22,13 +22,11 @@ struct AuthPageController: RouteCollection, @unchecked Sendable {
     private func activate(req: Request) async throws -> Response {
         let input = try req.query.decode(InActive.self)
         try await authService.activate(input: input, request: req)
-        try req.flash(.success, message: "激活成功")
         return req.redirect(to: "/page/posts/")
     }
 
     private func logout(req: Request) async throws -> Response {
         try await authService.logout(request: req)
-        try req.flash(.success, message: "退出成功")
         let response = req.redirect(to: "/page/posts/")
         // 删除 cookie
         response.cookies["access_token"] = .expired
@@ -52,8 +50,6 @@ struct AuthPageController: RouteCollection, @unchecked Sendable {
     private func login(req: Request) async throws -> Response {
         let inLogin = try req.content.decode(InLogin.self)
         let result = try await authService.login(input: inLogin, request: req)
-        // 返回到首页
-        try req.flash(.success, message: "登录成功")
         let response = req.redirect(to: "/page/posts/")
         // 设置 cookie
         setupCookie(result: result, response: response)

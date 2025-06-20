@@ -147,7 +147,6 @@ function showAuthMessage(msg, type='danger') {
   box.className = 'alert alert-' + type + ' text-center mt-3';
   box.innerText = msg;
   box.style.display = '';
-  setTimeout(() => { box.style.opacity = '0'; setTimeout(()=>{box.style.display='none';box.style.opacity='1';}, 500); }, 3000);
 }
 
 // 登录

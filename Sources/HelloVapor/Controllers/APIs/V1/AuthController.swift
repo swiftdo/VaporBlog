@@ -106,8 +106,6 @@ struct AuthController: RouteCollection, @unchecked Sendable {
         return .init(success: OutEmpty())
     }
 
-
-
     func changePwd(req: Request) async throws -> APIResponse<OutEmpty> { 
         let userPayload = try req.auth.require(UserPayload.self)
         guard let user = try await User.find(userPayload.userId, on: req.db) else {
