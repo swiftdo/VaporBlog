@@ -15,5 +15,6 @@
     </main>
     #extend("partials/footer")
     <script src="/third/bootstrap-5.3.6/bootstrap.bundle.min.js"></script>
+    <script src="/scripts/common.js"></script>
 </body>
 </html>

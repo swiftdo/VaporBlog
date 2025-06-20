@@ -46,9 +46,10 @@
         </h4>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="关闭"></button>
       </div>
+      <div id="auth-message" class="alert text-center mt-3" style="display:none;"></div>
       <div class="modal-body pt-4 px-4">
         <!-- 登录表单 -->
-        <form id="loginForm" class="fade-in" method="post" action="/page/auth/login">
+        <form id="loginForm" class="fade-in">
             <div class="mb-4">
                 <input type="email" name="email" class="form-control form-control-lg rounded-pill" id="loginEmail" placeholder="邮箱" required>
             </div>
@@ -61,7 +62,7 @@
             </div>
         </form>
         <!-- 注册表单（初始隐藏） -->
-        <form id="registerForm" style="display:none;" class="fade-in" method="post" action="/page/auth/register">
+        <form id="registerForm" style="display:none;" class="fade-in">
             <div class="mb-4">
                 <input type="email" name="email" class="form-control form-control-lg rounded-pill" id="registerEmail" placeholder="邮箱" required>
             </div>
@@ -135,5 +136,65 @@ document.getElementById('showLoginForm').onclick = function(e) {
   e.preventDefault();
   document.getElementById('registerForm').style.display = 'none';
   document.getElementById('loginForm').style.display = '';
+};
+</script>
+
+
+
+<script>
+function showAuthMessage(msg, type='danger') {
+  var box = document.getElementById('auth-message');
+  box.className = 'alert alert-' + type + ' text-center mt-3';
+  box.innerText = msg;
+  box.style.display = '';
+  setTimeout(() => { box.style.opacity = '0'; setTimeout(()=>{box.style.display='none';box.style.opacity='1';}, 500); }, 3000);
+}
+
+// 登录
+document.getElementById('loginForm').onsubmit = async function(e) {
+  e.preventDefault();
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value.trim();
+  try {
+    const resp = await fetch('/page/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+    if (resp.redirected) {
+      window.location.href = resp.url;
+      return;
+    }
+    const data = await resp.json();
+    if (!responseSuccess(data)) {
+      showAuthMessage(data.message || '登录失败');
+    }
+  } catch {
+    showAuthMessage('网络错误，请稍后重试');
+  }
+};
+
+// 注册
+document.getElementById('registerForm').onsubmit = async function(e) {
+  e.preventDefault();
+  const email = document.getElementById('registerEmail').value.trim();
+  const password = document.getElementById('registerPassword').value.trim();
+  try {
+    const resp = await fetch('/page/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+    if (resp.redirected) {
+      window.location.href = resp.url;
+      return;
+    }
+    const data = await resp.json();
+    if (!responseSuccess(data)) {
+      showAuthMessage(data.message || '登录失败');
+    }
+  } catch {
+    showAuthMessage('网络错误，请稍后重试');
+  }
 };
 </script>
