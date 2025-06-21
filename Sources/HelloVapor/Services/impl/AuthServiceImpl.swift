@@ -133,7 +133,7 @@ final class AuthServiceImpl: AuthService {
     }
 
     // 生成认证令牌
-    private func generateAuthTokens(for user: User, on db: any Database, req: Request) async throws
+    func generateAuthTokens(for user: User, on db: any Database, req: Request) async throws
         -> OutLogin
     {
         let payload = UserPayload(userId: try user.requireID())
