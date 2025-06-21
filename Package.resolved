@@ -1,5 +1,5 @@
 {
-  "originHash" : "10eaa808327f3d5e5a00f0c18eac692217fb20f78ade398ecc73b3f67b15d245",
+  "originHash" : "1a21bf0a628cc70d43a5c075bc7c917f5f4963bdbcf7bbb16fb428a88c121aef",
   "pins" : [
     {
       "identity" : "async-http-client",
@@ -53,6 +53,15 @@
       "state" : {
         "revision" : "095bc5a17ab3363167f4becb270b6f8eb790481c",
         "version" : "2.10.1"
+      }
+    },
+    {
+      "identity" : "imperial",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/vapor-community/Imperial.git",
+      "state" : {
+        "revision" : "89b8b66f17a9af2277a1ca7985486564d3b9ac3f",
+        "version" : "2.0.0"
       }
     },
     {
@@ -213,8 +222,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-distributed-tracing.git",
       "state" : {
-        "revision" : "a64a0abc2530f767af15dd88dda7f64d5f1ff9de",
-        "version" : "1.2.0"
+        "revision" : "b78796709d243d5438b36e74ce3c5ec2d2ece4d8",
+        "version" : "1.2.1"
       }
     },
     {
@@ -285,8 +294,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-nio-ssl.git",
       "state" : {
-        "revision" : "4b38f35946d00d8f6176fe58f96d83aba64b36c7",
-        "version" : "2.31.0"
+        "revision" : "36b48956eb6c0569215dc15a587b491d2bb36122",
+        "version" : "2.32.0"
       }
     },
     {

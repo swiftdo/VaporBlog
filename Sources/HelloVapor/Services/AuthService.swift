@@ -20,4 +20,7 @@ protocol AuthService {
 
     /// 激活
     func activate(input: InActive, request: Request) async throws -> Void
+
+    /// 生成 token
+    func generateAuthTokens(for user: User, on db: any Database, req: Request) async throws -> OutLogin
 }

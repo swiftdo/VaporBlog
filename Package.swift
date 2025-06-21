@@ -13,7 +13,8 @@ let package = Package(
         .package(url: "https://github.com/vapor/fluent-postgres-driver.git", from: "2.10.0"),
         .package(url: "https://github.com/vapor/leaf.git", from: "4.4.0"),
         .package(url: "https://github.com/vapor/jwt.git", from: "5.0.0"),
-        .package(url: "https://github.com/Mikroservices/Smtp.git", from: "3.0.0")
+        .package(url: "https://github.com/Mikroservices/Smtp.git", from: "3.0.0"),
+        .package(url: "https://github.com/vapor-community/Imperial.git", from: "2.0.0")
     ],
     targets: [
         .executableTarget(
@@ -26,7 +27,8 @@ let package = Package(
                 .product(name: "FluentPostgresDriver", package: "fluent-postgres-driver"),
                 .product(name: "Leaf", package: "leaf"),
                 .product(name: "JWT", package: "jwt"),
-                .product(name: "Smtp", package: "Smtp")
+                .product(name: "Smtp", package: "Smtp"),
+                .product(name: "ImperialGitHub", package: "Imperial")
             ],
             swiftSettings: swiftSettings
         ),

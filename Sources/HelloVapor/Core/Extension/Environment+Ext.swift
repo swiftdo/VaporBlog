@@ -19,6 +19,34 @@ extension Environment {
     }
 
     static func SITE_DOMAIN() -> String {
-        return Environment.get("SITE_DOMAIN") ?? "http://localhost:8080"
+        // 站点域名
+        guard let value = Environment.get("SITE_DOMAIN") else {
+            fatalError("Missing SITE_DOMAIN environment variable.")
+        }
+        return value;
+    }
+
+    static func GITHUB_CLIENT_ID() -> String {
+        // github 应用 id 
+        guard let value = Environment.get("GITHUB_CLIENT_ID") else {
+            fatalError("Missing GITHUB_CLIENT_ID environment variable.")
+        }
+        return value;
+    }
+
+    static func GITHUB_CALLBACK_URL() -> String {
+        // github 回调地址
+        guard let value = Environment.get("GITHUB_CALLBACK_URL") else {
+            fatalError("Missing GITHUB_CALLBACK_URL environment variable.")
+        }
+        return value;
+    }
+
+    static func GITHUB_CLIENT_SECRET() -> String {
+        // github 应用密钥
+        guard let value = Environment.get("GITHUB_CLIENT_SECRET") else {
+            fatalError("Missing GITHUB_CLIENT_SECRET environment variable.")
+        }
+        return value;
     }
 }

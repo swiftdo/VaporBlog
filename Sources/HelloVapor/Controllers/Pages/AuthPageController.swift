@@ -1,4 +1,7 @@
 import Vapor
+import Fluent
+import ImperialGitHub
+
 struct AuthPageController: RouteCollection, @unchecked Sendable {
     let authService: any AuthService
 
@@ -7,6 +10,7 @@ struct AuthPageController: RouteCollection, @unchecked Sendable {
     }
 
     func boot(routes: any RoutesBuilder) throws {
+        
         let auth = routes.grouped("auth")
 
         let secure = auth.grouped(UserAuthenticatorMiddleware())
@@ -17,16 +21,59 @@ struct AuthPageController: RouteCollection, @unchecked Sendable {
 
         // 需要登录
         secure.post("logout", use: logout)
+
+        try auth.oAuth(
+            from: GitHub.self, 
+            authenticate: "login-github", 
+            callback: Environment.GITHUB_CALLBACK_URL(), 
+            completion: processGitHubLogin
+        )
+    }
+
+    private func processGitHubLogin(request: Request, token: String) async throws -> Response {
+        let userInfo = try await GitHub.getUser(on: request)
+
+        // 查找邮箱是否已注册
+        let userAuth = try await UserAuth.query(on: request.db)
+            .filter(\.$identifier == userInfo.login)
+            .filter(\.$authType == UserAuth.AuthType.github.rawValue)
+            .with(\.$user)
+            .first()
+
+        if let userAuth {
+            // 直接登录
+            if userAuth.user.status == User.Status.banned.rawValue {
+                throw APIError.custom(code: 602, msg: "账号已被禁用，请联系管理员")
+            }
+            return try await githubLoginWithUser(userAuth.user, request: request)
+        } else {
+            // 注册， 默认激活状态
+            let user = User(nickname: userInfo.name, status: .active)
+            try await user.create(on: request.db) 
+            let auth = try UserAuth(userID: user.requireID(), authType: UserAuth.AuthType.github, identifier: userInfo.login)
+            try await auth.create(on: request.db)
+            return try await githubLoginWithUser(user, request: request)
+        }
+    }
+
+    private func githubLoginWithUser(_ user: User, request: Request) async throws -> Response { 
+        let result = try await authService.generateAuthTokens(for: user, on: request.db, req: request)
+            let response = request.redirect(to: "/page/posts/")
+            // 设置 cookie
+            setupCookie(result: result, response: response)
+            return response
     }
 
     private func activate(req: Request) async throws -> Response {
         let input = try req.query.decode(InActive.self)
         try await authService.activate(input: input, request: req)
+        try req.flash(.success, message: "激活成功")
         return req.redirect(to: "/page/posts/")
     }
 
     private func logout(req: Request) async throws -> Response {
         try await authService.logout(request: req)
+        try req.flash(.success, message: "退出成功")
         let response = req.redirect(to: "/page/posts/")
         // 删除 cookie
         response.cookies["access_token"] = .expired
@@ -71,5 +118,34 @@ struct AuthPageController: RouteCollection, @unchecked Sendable {
             isHTTPOnly: true
         )
     } 
+
+}
+
+struct GithubUserInfo: Content {
+    let name: String 
+    let login: String // 是 GitHub 用户名（登录名），用于标识一个用户在 GitHub 上的唯一公开身份
+    let email: String // 邮箱。
+
+
+}
+
+extension GitHub {
+    static func getUser(on req: Request) async throws -> GithubUserInfo {
+        var headers = HTTPHeaders()
+        try headers.add(name: .authorization, value: "token \(req.accessToken)")
+        headers.add(name: .userAgent, value: "Vapor")
+
+        let response = try await req.client.get("https://api.github.com/user", headers: headers)
+
+        guard response.status == .ok else {
+            if response.status == .unauthorized {
+                throw Abort.redirect(to: "/login-github")
+            } else {
+                throw Abort(.internalServerError)
+            }
+        }
+
+        return try response.content.decode(GithubUserInfo.self)
+    }
 
 }
