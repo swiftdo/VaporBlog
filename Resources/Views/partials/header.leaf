@@ -57,6 +57,12 @@
                 <input type="password" name="password" class="form-control form-control-lg rounded-pill" id="loginPassword" placeholder="密码" required>
             </div>
             <button type="submit" class="btn btn-primary btn-lg w-100 rounded-pill shadow" style="background:linear-gradient(90deg,#4f8cff,#38cfa6);border:0;">登录</button>
+            <div class="text-center mt-3">
+              <a href="/page/auth/login-github" class="btn btn-dark w-100 rounded-pill">
+                使用 GitHub 登录
+              </a>
+            </div>
+            
             <div class="text-center mt-4">
                 <a href="#" id="showRegisterForm" class="switch-link">没有账号？<b>去注册</b></a>
             </div>

@@ -4,9 +4,11 @@ import ImperialGitHub
 
 struct AuthPageController: RouteCollection, @unchecked Sendable {
     let authService: any AuthService
+    let app: Application
 
-    init(authService: any AuthService) {
+    init(authService: any AuthService, app: Application) {
         self.authService = authService
+        self.app = app
     }
 
     func boot(routes: any RoutesBuilder) throws {
@@ -22,9 +24,10 @@ struct AuthPageController: RouteCollection, @unchecked Sendable {
         // 需要登录
         secure.post("logout", use: logout)
 
-        try auth.oAuth(
+        // 点击登录进行的链接
+        try app.grouped(app.sessions.middleware).oAuth(
             from: GitHub.self, 
-            authenticate: "login-github", 
+            authenticate: "page/auth/login-github",  
             callback: Environment.GITHUB_CALLBACK_URL(), 
             completion: processGitHubLogin
         )
@@ -139,7 +142,7 @@ extension GitHub {
 
         guard response.status == .ok else {
             if response.status == .unauthorized {
-                throw Abort.redirect(to: "/login-github")
+                throw Abort.redirect(to: "/page/auth/login-github")
             } else {
                 throw Abort(.internalServerError)
             }

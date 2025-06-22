@@ -30,8 +30,7 @@ func routes(_ app: Application) throws {
     // MARK-页面控制器
     try app.grouped(app.sessions.middleware).group("page") { page in
         try page.register(collection: PostPageController())
-        try page.register(collection: AuthPageController(authService: authService))
+        try page.register(collection: AuthPageController(authService: authService, app: app))
         try page.register(collection: UserPageController())
     }
-
 }
