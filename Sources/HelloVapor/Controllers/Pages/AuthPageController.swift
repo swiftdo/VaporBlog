@@ -79,8 +79,8 @@ struct AuthPageController: RouteCollection, @unchecked Sendable {
         try req.flash(.success, message: "退出成功")
         let response = req.redirect(to: "/page/posts/")
         // 删除 cookie
-        response.cookies["access_token"] = .expired
-        response.cookies["refresh_token"] = .expired
+        response.cookies.expired(key: .accessToken)
+        response.cookies.expired(key: .refreshToken)
         return response
     }
 
@@ -107,19 +107,20 @@ struct AuthPageController: RouteCollection, @unchecked Sendable {
     }
 
     private func setupCookie(result: OutLogin, response: Response) {
-        response.cookies["access_token"] = HTTPCookies.Value(
+
+        response.cookies.set(key: .accessToken, value: HTTPCookies.Value(
             string: result.token,
             expires: Date().addingTimeInterval(Environment.ACCESS_TOKEN_EXPIRE()),
             isSecure: true,
             isHTTPOnly: true,
-        )
+        ))
 
-        response.cookies["refresh_token"] = HTTPCookies.Value(
+        response.cookies.set(key: .refreshToken, value: HTTPCookies.Value(
             string: result.refreshToken,
             expires: Date().addingTimeInterval(Environment.REFRESH_TOKEN_EXPIRE()),
             isSecure: true,
             isHTTPOnly: true
-        )
+        ))
     } 
 
 }
