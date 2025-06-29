@@ -3,6 +3,7 @@ struct PostPageController: RouteCollection {
     func boot(routes: any RoutesBuilder) throws {
         let posts = routes.grouped("posts").grouped(UserAuthenticatorMiddleware())
         
+        let secure = posts.grouped(UserAuthenticatorMiddleware())
         // GET 请求：页面展示
         posts.get(use: indexPage)                // 列表页面
         posts.get("create", use: createPage)     // 创建页面
@@ -10,14 +11,24 @@ struct PostPageController: RouteCollection {
         posts.get(":id", "edit", use: editPage)  // 编辑页面
         
         // 数据操作
-        posts.post(use: storeAction)             // 创建资源
-        posts.post(":id", "update", use: updateAction)     // 更新资源, 因为表单不支持 put
-        posts.post(":id", "delete", use: deleteAction)   // 删除资源, 因为表单不支持 delete
+        secure.post(use: storeAction)             // 创建资源
+        secure.post(":id", "update", use: updateAction)     // 更新资源, 因为表单不支持 put
+        secure.post(":id", "delete", use: deleteAction)   // 删除资源, 因为表单不支持 delete
     }
     
     // 保存新文章
     func storeAction(req: Request) async throws -> Response {
-        let post = try req.content.decode(Post.self)
+        let userPayload = try req.auth.require(UserPayload.self)
+        let input = try req.content.decode(InPost.self)
+
+        let post = Post(
+            title: input.title, 
+            content: input.content, 
+            authorId: userPayload.userId,
+            excerpt: input.excerpt, 
+            status: input.status ?? .draft,
+            publishedAt: input.status == .published ? Date() : nil
+        )
         try await post.save(on: req.db)
         return req.redirect(to: "/page/posts")
     }
@@ -46,7 +57,7 @@ struct PostPageController: RouteCollection {
     // 列表页
     func indexPage(req: Request) async throws -> View {
         let payload = req.auth.get(UserPayload.self)
-        let posts = try await Post.query(on: req.db).sort(\.$createdAt, .descending).all()
+        let posts = try await Post.query(on: req.db).with(\.$author).sort(\.$createdAt, .descending).all()
 
         var context: [String: AnyEncodable] = [
             "posts": AnyEncodable(value: posts.map { OutPost(from: $0) }),

@@ -51,8 +51,26 @@ struct PostController: RouteCollection {
             status: input.status ?? .draft,
             publishedAt: input.status == .published ? Date() : nil
         )
-        try await post.create(on: req.db)
-        return APIResponse(success: OutPost(from: post))
+        // 处理分类和标签
+        return try await req.db.transaction { db  in
+            try await post.create(on: req.db)
+            // 处理分类和标签
+            if let categoryIds = input.categoryIds {
+                let categoryIDs = categoryIds.split(separator: ",").compactMap { UUID(uuidString: String($0)) }
+                let categories = try await Category.query(on: req.db)
+                    .filter(\.$id ~~ categoryIDs)
+                    .all()
+                try await post.$categories.attach(categories, on: req.db)
+            }
+            if let tagIds = input.tagIds {
+                let tagIDs = tagIds.split(separator: ",").compactMap { UUID(uuidString: String($0)) }
+                let tags = try await Tag.query(on: req.db)
+                    .filter(\.$id ~~ tagIDs)
+                    .all()
+                try await post.$tags.attach(tags, on: req.db)
+            }
+            return APIResponse(success: OutPost(from: post))
+        }
     }
 
     // 查看单篇
