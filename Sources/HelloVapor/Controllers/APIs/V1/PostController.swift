@@ -13,7 +13,7 @@ struct PostController: RouteCollection {
         let posts = routes.grouped("posts")
         posts.get(use: index)
 
-        posts.post(use: create)
+        // posts.post(use: create)
         posts.group(":postID") { post in
             post.get(use: show)
             post.put(use: update)
@@ -29,13 +29,13 @@ struct PostController: RouteCollection {
     }
 
     // 新建文章
-    func create(req: Request) async throws -> APIResponse<OutPost> {
-        try InPost.validate(content: req)
-        let input = try req.content.decode(InPost.self)
-        let post = Post(title: input.title, content: input.content)
-        try await post.create(on: req.db)
-        return APIResponse(success: OutPost(from: post))
-    }
+    // func create(req: Request) async throws -> APIResponse<OutPost> {
+    //     try InPost.validate(content: req)
+    //     let input = try req.content.decode(InPost.self)
+    //     let post = Post(title: input.title, content: input.content)
+    //     try await post.create(on: req.db)
+    //     return APIResponse(success: OutPost(from: post))
+    // }
 
     // 查看单篇
     func show(req: Request) async throws -> APIResponse<OutPost> {

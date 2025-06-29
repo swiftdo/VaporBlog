@@ -36,6 +36,11 @@ final class User: Model, Content, @unchecked Sendable {
     var updatedAt: Date?
 
 
+    // 与 Posts 的关系：一个用户可以有多篇文章
+    @Children(for: \.$author)
+    var posts: [Post]
+
+
     init() {}
 
     init(nickname: String, status: Status = .inactive) {

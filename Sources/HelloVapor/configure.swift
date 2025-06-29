@@ -53,6 +53,13 @@ private func migrations(_ app: Application) throws {
     app.migrations.add(CreateUserAuth())
     app.migrations.add(CreateRefreshToken())
     app.migrations.add(CreateEmailVerifyCode())
+    
+    app.migrations.add(AddFilesToPost())
+    app.migrations.add(CreateCategory())
+    app.migrations.add(CreatePostCategory())
+    app.migrations.add(CreateTag())
+    app.migrations.add(CreatePostTag())
+    app.migrations.add(CreateComment())
 }
 
 // 数据库配置

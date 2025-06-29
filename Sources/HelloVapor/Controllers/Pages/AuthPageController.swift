@@ -61,10 +61,10 @@ struct AuthPageController: RouteCollection, @unchecked Sendable {
 
     private func githubLoginWithUser(_ user: User, request: Request) async throws -> Response { 
         let result = try await authService.generateAuthTokens(for: user, on: request.db, req: request)
-            let response = request.redirect(to: "/page/posts/")
-            // 设置 cookie
-            setupCookie(result: result, response: response)
-            return response
+        let response = request.redirect(to: "/page/posts/")
+        // 设置 cookie
+        setupCookie(result: result, response: response)
+        return response
     }
 
     private func activate(req: Request) async throws -> Response {
@@ -129,8 +129,6 @@ struct GithubUserInfo: Content {
     let name: String 
     let login: String // 是 GitHub 用户名（登录名），用于标识一个用户在 GitHub 上的唯一公开身份
     let email: String // 邮箱。
-
-
 }
 
 extension GitHub {
@@ -151,5 +149,4 @@ extension GitHub {
 
         return try response.content.decode(GithubUserInfo.self)
     }
-
 }
