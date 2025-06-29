@@ -8,7 +8,13 @@
 import Vapor
 import Fluent
 
-struct PostController: RouteCollection {
+struct PostController: RouteCollection, @unchecked Sendable {
+    let postService: any PostService
+
+    init(postService: any PostService) {
+        self.postService = postService
+    }
+
     func boot(routes: any RoutesBuilder) throws {
         let posts = routes.grouped("posts")
 
@@ -35,42 +41,14 @@ struct PostController: RouteCollection {
 
     // 新建文章
     func create(req: Request) async throws -> APIResponse<OutPost> {
-        try InPost.validate(content: req)
-
         let userPayload = try req.auth.require(UserPayload.self)
         guard let user = try await User.find(userPayload.userId, on: req.db) else {
             throw APIError.notFound(msg: "用户不存在")
         }
-
+        try InPost.validate(content: req)
         let input = try req.content.decode(InPost.self)
-        let post = try Post(
-            title: input.title, 
-            content: input.content, 
-            authorId: user.requireID(), 
-            excerpt: input.excerpt, 
-            status: input.status ?? .draft,
-            publishedAt: input.status == .published ? Date() : nil
-        )
-        // 处理分类和标签
-        return try await req.db.transaction { db  in
-            try await post.create(on: req.db)
-            // 处理分类和标签
-            if let categoryIds = input.categoryIds {
-                let categoryIDs = categoryIds.split(separator: ",").compactMap { UUID(uuidString: String($0)) }
-                let categories = try await Category.query(on: req.db)
-                    .filter(\.$id ~~ categoryIDs)
-                    .all()
-                try await post.$categories.attach(categories, on: req.db)
-            }
-            if let tagIds = input.tagIds {
-                let tagIDs = tagIds.split(separator: ",").compactMap { UUID(uuidString: String($0)) }
-                let tags = try await Tag.query(on: req.db)
-                    .filter(\.$id ~~ tagIDs)
-                    .all()
-                try await post.$tags.attach(tags, on: req.db)
-            }
-            return APIResponse(success: OutPost(from: post))
-        }
+        let outPost = try await postService.create(input: input, userId: user.requireID(), req: req)
+        return APIResponse(success: outPost)
     }
 
     // 查看单篇

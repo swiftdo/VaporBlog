@@ -17,11 +17,12 @@ func routes(_ app: Application) throws {
     }
 
     let authService: any AuthService = AuthServiceImpl()
+    let postService: any PostService = PostServiceImpl()
 
     // MARK-API控制器
     try app.group("api") { api in
         try api.group("v1") { v1 in
-            try v1.register(collection: PostController())
+            try v1.register(collection: PostController(postService: postService))
             try v1.register(collection: AuthController(authService: authService))
             try v1.register(collection: UserController())
             try v1.register(collection: CategoryController())
