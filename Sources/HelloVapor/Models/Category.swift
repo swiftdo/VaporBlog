@@ -38,7 +38,7 @@ final class Category: Model, Content, @unchecked Sendable {
 
     init() {}
 
-    init(name: String, description: String) {
+    init(name: String, description: String? = nil) {
         self.name = name
         self.description = description
     }

@@ -60,6 +60,10 @@ private func migrations(_ app: Application) throws {
     app.migrations.add(CreateTag())
     app.migrations.add(CreatePostTag())
     app.migrations.add(CreateComment())
+
+    // 添加初始数据迁移
+    app.migrations.add(SeedInitialTag())
+    app.migrations.add(SeedInitialCategory())
 }
 
 // 数据库配置
