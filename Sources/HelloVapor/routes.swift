@@ -24,6 +24,8 @@ func routes(_ app: Application) throws {
             try v1.register(collection: PostController())
             try v1.register(collection: AuthController(authService: authService))
             try v1.register(collection: UserController())
+            try v1.register(collection: CategoryController())
+            try v1.register(collection: TagController())
         }
     }
 
