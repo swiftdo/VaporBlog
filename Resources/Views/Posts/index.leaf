@@ -6,7 +6,11 @@
 #export("body"):
     <div class="container mt-4">
         <h1 class="mb-4">所有文章</h1>
-        <a href="/page/posts/create" class="btn btn-primary mb-3">➕ 创建新文章</a>
+
+        #if(user):
+            <a href="/page/posts/create" class="btn btn-primary mb-3">➕ 创建新文章</a>
+        #else:
+        #endif
         <ul class="list-group">
         #for(post in posts):
             <li class="list-group-item d-flex justify-content-between align-items-center">

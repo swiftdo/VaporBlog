@@ -13,6 +13,10 @@ struct OutPost: Out {
     let content: String
     let createdAt: Date?
     let updatedAt: Date?
+    let authorId: UUID
+    let excerpt: String?
+    let status: String?
+    let author: OutUser?
 
     // 专业推荐：DTO 层负责转换，解耦模型
     init(from post: Post) {
@@ -21,5 +25,14 @@ struct OutPost: Out {
         self.content = post.content
         self.createdAt = post.createdAt
         self.updatedAt = post.updatedAt
+        self.authorId = post.$author.id
+        self.excerpt = post.excerpt
+        self.status = post.status
+
+        if let user = post.$author.value {
+            self.author = OutUser(user: user)
+        } else {
+            self.author = nil
+        }
     }
 }

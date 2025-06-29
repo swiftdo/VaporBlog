@@ -10,6 +10,8 @@ import Vapor
 struct InPost: In, Validatable {
     let title: String
     let content: String
+    let excerpt: String? // 概要
+    let status: Post.Status? // 文章状态
 
     static func validations(_ validations: inout Validations) {
         validations.add("title", as: String.self, is: .count(1...), customFailureDescription: "标题不能为空")
