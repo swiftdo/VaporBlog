@@ -73,35 +73,25 @@ const cherryInstance = new Cherry({
         }
     }
 });
-{
-function getPlainTextFromCherryMarkdown(cherryInstance, numWords = 50) {
+
+function getPlainTextFromCherryMarkdown(cherryInstance, maxLength = 150) {
     if (!cherryInstance) {
         console.warn("Cherry Markdown 实例未找到。");
         return '';
     }
 
-    // 2. 将 Markdown 渲染成 HTML
-    const htmlContent = cherryInstance.getHtml();;
-
-    // 3. 用 DOM 解析，移除 <a>、<code>、<pre>、<img> 等标签
+    const htmlContent = cherryInstance.getHtml();
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = htmlContent;
-
-    // 移除链接、代码块、内联代码、图片等
     tempDiv.querySelectorAll('a, code, pre, img').forEach(el => el.remove());
-
-    // 只保留纯文本
     let plainText = tempDiv.textContent || tempDiv.innerText || '';
-
-    // 进一步处理空白符
     plainText = plainText.replace(/\s+/g, ' ').trim();
 
-    // 截取前 N 个单词
-    const words = plainText.match(/\S+/g) || [];
-    if (words.length <= numWords) {
-        return words.join(' ');
+    // 按字符数截取
+    if (plainText.length <= maxLength) {
+        return plainText;
     } else {
-        return words.slice(0, numWords).join(' ');
+        return plainText.slice(0, maxLength) + '...';
     }
 }
 
