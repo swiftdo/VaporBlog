@@ -34,7 +34,11 @@ struct PostController: RouteCollection, @unchecked Sendable {
 
     // 看所有文章
     func index(req: Request) async throws -> APIResponse<[OutPost]> {
-        let posts = try await Post.query(on: req.db).with(\.$author).all()
+        let posts = try await Post.query(on: req.db)
+            .with(\.$author)
+            .with(\.$categories)
+            .with(\.$tags)
+            .all()
         let out = posts.map { OutPost(from: $0) }
         return APIResponse(success: out)
     }
@@ -53,10 +57,16 @@ struct PostController: RouteCollection, @unchecked Sendable {
 
     // 查看单篇
     func show(req: Request) async throws -> APIResponse<OutPost> {
-        guard let post = try await Post.find(req.parameters.get("postID"), on: req.db) else {
+        guard let postId = req.parameters.get("postID"),
+            let uuid = UUID(uuidString: postId),
+            let post = try await Post.query(on: req.db)
+                .with(\.$author)
+                .with(\.$categories)
+                .with(\.$tags)
+                .filter(\.$id == uuid)
+                .first() else {
             throw APIError.notFound(msg: "文章不存在")
         }
-        try await post.$author.load(on: req.db)
         return APIResponse(success: OutPost(from: post))
     }
 

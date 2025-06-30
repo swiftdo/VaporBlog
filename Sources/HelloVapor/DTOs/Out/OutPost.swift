@@ -17,7 +17,9 @@ struct OutPost: Out {
     let excerpt: String?
     let status: String?
     let author: OutUser?
-
+    let categories: [OutCategory]
+    let tags: [OutTag]
+    
     // 专业推荐：DTO 层负责转换，解耦模型
     init(from post: Post) {
         self.id = post.id!
@@ -33,6 +35,18 @@ struct OutPost: Out {
             self.author = OutUser(user: user)
         } else {
             self.author = nil
+        }
+
+        if let categories = post.$categories.value {
+            self.categories = categories.map { OutCategory(from: $0) }
+        } else {
+            self.categories = []
+        }
+
+        if let tags = post.$tags.value {
+            self.tags = tags.map { OutTag(from: $0) }
+        } else {
+            self.tags = []
         }
     }
 }

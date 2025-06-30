@@ -5,9 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>#(title)</title>
     <link href="/third/bootstrap-5.3.6/bootstrap.min.css" rel="stylesheet" />
+    <link href="/third/sweetalert2-11.22.2/sweetalert2.min.css" rel="stylesheet" />
+    <link href="/third/select2-4.1.0-rc.0/select2.min.css" rel="stylesheet" >
     <link href="/third/cherry-markdown-0.9.4/cherry-markdown.min.css" rel="stylesheet" />
     <script src="/third/cherry-markdown-0.9.4/cherry-markdown.min.js"></script>
-    <link href="/third/sweetalert2-11.22.2/sweetalert2.min.css" rel="stylesheet" />
+    <script src="/third/jquery-3.7.1/jquery.min.js"></script>
     #import("styles")
 </head>
 <body class="d-flex flex-column min-vh-100">
@@ -21,5 +23,6 @@
     <script src="/third/bootstrap-5.3.6/bootstrap.bundle.min.js"></script>
     <script src="/scripts/common.js"></script>
     <script src="/third/sweetalert2-11.22.2/sweetalert2.all.min.js"></script>
+    <script src="/third/select2-4.1.0-rc.0/select2.min.js"></script>
 </body>
 </html>

@@ -26,11 +26,40 @@
             <label for="title" class="form-label">概要</label>
             <input type="text" class="form-control" id="excerpt" name="excerpt" required>
         </div>
+
+        <div class="mb-3">
+            <label for="tags" class="form-label">分类</label>
+            <select class="form-select" id="categories" name="categories" multiple>
+                #for(category in categories):
+                    <option value="#(category.id)">#(category.name)</option>
+                #endfor
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="tags" class="form-label">标签</label>
+            <select class="form-select" id="tags" name="tags" multiple>
+                #for(tag in tags):
+                    <option value="#(tag.id)">#(tag.name)</option>
+                #endfor
+            </select>
+        </div>
+
+        
+
+
         <button type="submit" class="btn btn-primary">提交</button>
         <a href="/page/posts" class="btn btn-secondary ms-2">返回列表</a>
     </form>
 </div>
 <script>
+
+$(document).ready(function() {
+    $('#tags').select2({placeholder:  "请选择标签", allowClear: true});
+    $('#categories').select2({placeholder:  "请选择分类", allowClear: true});
+});
+
+
 const cherryInstance = new Cherry({
     id: 'markdown-container',
     value: '# welcome to cherry editor!',
@@ -78,14 +107,23 @@ function getPlainTextFromCherryMarkdown(cherryInstance, numWords = 50) {
     }
 }
 
-// 提交
-document.getElementById('postForm').onsubmit = async function(e) {
+$('#postForm').on('submit', async function(e) { 
   e.preventDefault();
-  const title = document.getElementById('title').value.trim();
-  const excerpt = document.getElementById('excerpt').value.trim();
+  const title = $('#title').val().trim();
+  const excerpt = $('#excerpt').val().trim();
   const content = cherryInstance.getMarkdown();
 
-  alert(content);
+  // 获取标签
+  const selectedTags = $('#tags').val(); 
+
+  // 获取分类
+  const selectedCategories = $('#categories').val();
+
+  alert(selectedTags);
+  alert(selectedCategories);
+
+
+
 
   try {
     const resp = await fetch('/page/posts/', {
@@ -95,7 +133,9 @@ document.getElementById('postForm').onsubmit = async function(e) {
         "title": title,
         "excerpt": excerpt,
         "content": content,
-        "status": "published"
+        "status": "published",
+        "tagIds": selectedTags.join(","),
+        "categoryIds": selectedCategories.join(",")
      }),
     });
     if (resp.redirected) {
@@ -111,14 +151,13 @@ document.getElementById('postForm').onsubmit = async function(e) {
       });
     }
   } catch {
-    showAuthMessage('网络错误，请稍后重试');
+    Swal.fire({
+      title: '失败',
+      text: '网络错误，请稍后重试',
+      icon: 'error'
+    });
   }
-
-
-
-
-
-}
+});
 
 
 

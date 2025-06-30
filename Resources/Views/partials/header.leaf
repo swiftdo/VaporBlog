@@ -156,10 +156,10 @@ function showAuthMessage(msg) {
 }
 
 // 登录
-document.getElementById('loginForm').onsubmit = async function(e) {
+$('#loginForm').on('submit', async function(e) {
   e.preventDefault();
-  const email = document.getElementById('loginEmail').value.trim();
-  const password = document.getElementById('loginPassword').value.trim();
+  const email = $('#loginEmail').val().trim();
+  const password = $('#loginPassword').val().trim();
   try {
     const resp = await fetch('/page/auth/login', {
       method: 'POST',
@@ -177,13 +177,12 @@ document.getElementById('loginForm').onsubmit = async function(e) {
   } catch {
     showAuthMessage('网络错误，请稍后重试');
   }
-};
+});
 
-// 注册
-document.getElementById('registerForm').onsubmit = async function(e) {
+$('#registerForm').on("submit", async function(e) { 
   e.preventDefault();
-  const email = document.getElementById('registerEmail').value.trim();
-  const password = document.getElementById('registerPassword').value.trim();
+  const email = $('#registerEmail').val().trim();
+  const password = $('#registerPassword').val().trim();
   try {
     const resp = await fetch('/page/auth/register', {
       method: 'POST',
@@ -201,5 +200,7 @@ document.getElementById('registerForm').onsubmit = async function(e) {
   } catch {
     showAuthMessage('网络错误，请稍后重试');
   }
-};
+
+});
+
 </script>

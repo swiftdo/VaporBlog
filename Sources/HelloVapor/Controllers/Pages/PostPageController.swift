@@ -1,4 +1,6 @@
 import Vapor
+import Fluent
+
 struct PostPageController: RouteCollection, @unchecked Sendable {
 
     let postService: any PostService
@@ -55,7 +57,11 @@ struct PostPageController: RouteCollection, @unchecked Sendable {
     // 列表页
     func indexPage(req: Request) async throws -> View {
         let payload = req.auth.get(UserPayload.self)
-        let posts = try await Post.query(on: req.db).with(\.$author).sort(\.$createdAt, .descending).all()
+        let posts = try await Post.query(on: req.db)
+            .with(\.$author)
+            .with(\.$categories)
+            .with(\.$tags)
+            .sort(\.$createdAt, .descending).all()
 
         var context: [String: AnyEncodable] = [
             "posts": AnyEncodable(value: posts.map { OutPost(from: $0) }),
@@ -72,33 +78,50 @@ struct PostPageController: RouteCollection, @unchecked Sendable {
     // 创建页
     func createPage(req: Request) async throws -> View {
         let payload = req.auth.get(UserPayload.self)
-
-    
-    
-
         var user: OutUser? 
+        var context: [String: AnyEncodable] = [:]
+        if let payload, let dbuser = try await User.find(payload.userId, on: req.db) {
+            user = OutUser(user: dbuser)
+            context["user"] = AnyEncodable(value: user)
+        }
+        let categories = try await Category.query(on: req.db).all()
+        let tags = try await Tag.query(on: req.db).all()
+        context["categories"] = AnyEncodable(value: categories)
+        context["tags"] = AnyEncodable(value: tags)
+        return try await req.view.render("posts/create", context)
+    }
 
+    // 详情页（可选）
+    func showPage(req: Request) async throws -> View {
 
+        let payload = req.auth.get(UserPayload.self)
+        var user: OutUser? 
         var context: [String: AnyEncodable] = [:]
         if let payload, let dbuser = try await User.find(payload.userId, on: req.db) {
             user = OutUser(user: dbuser)
             context["user"] = AnyEncodable(value: user)
         }
 
-        let categories = try await Category.query(on: req.db).all()
-        let tags = try await Tag.query(on: req.db).all()
-        context["categories"] = AnyEncodable(value: categories)
-        context["tags"] = AnyEncodable(value: tags)
 
-        return try await req.view.render("posts/create", context)
-    }
-
-    // 详情页（可选）
-    func showPage(req: Request) async throws -> View {
-        guard let post = try await Post.find(req.parameters.get("id"), on: req.db) else {
+        guard let postId = req.parameters.get("id"), let uuid = UUID(uuidString: postId) else {
             throw Abort(.notFound)
         }
-        return try await req.view.render("posts/show", ["post": post])
+        
+        // 查询文章
+        guard let post = try await Post.query(on: req.db)
+            .with(\.$author)
+            .with(\.$categories)
+            .with(\.$tags)
+            .filter(\.$id == uuid)
+            .first() else {
+                throw Abort(.notFound)
+            }
+
+        context["post"] = AnyEncodable(value: OutPost(from: post))
+
+        // 渲染视图
+        return try await req.view.render("posts/show", context)
+        
     }
 
     // 编辑页
