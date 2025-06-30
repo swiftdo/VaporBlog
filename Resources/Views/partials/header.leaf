@@ -46,7 +46,6 @@
         </h4>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="关闭"></button>
       </div>
-      <div id="auth-message" class="alert text-center mt-3" style="display:none;"></div>
       <div class="modal-body pt-4 px-4">
         <!-- 登录表单 -->
         <form id="loginForm" class="fade-in">
@@ -148,11 +147,12 @@ document.getElementById('showLoginForm').onclick = function(e) {
 
 
 <script>
-function showAuthMessage(msg, type='danger') {
-  var box = document.getElementById('auth-message');
-  box.className = 'alert alert-' + type + ' text-center mt-3';
-  box.innerText = msg;
-  box.style.display = '';
+function showAuthMessage(msg) {
+  Swal.fire({
+    title: '失败',
+    text: msg,
+    icon: 'error'
+  });
 }
 
 // 登录

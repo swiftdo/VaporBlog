@@ -1,5 +1,12 @@
 import Vapor
-struct PostPageController: RouteCollection {
+struct PostPageController: RouteCollection, @unchecked Sendable {
+
+    let postService: any PostService
+
+    init(postService: any PostService) {
+        self.postService = postService
+    }
+
     func boot(routes: any RoutesBuilder) throws {
         let posts = routes.grouped("posts").grouped(UserAuthenticatorMiddleware())
         
@@ -20,16 +27,7 @@ struct PostPageController: RouteCollection {
     func storeAction(req: Request) async throws -> Response {
         let userPayload = try req.auth.require(UserPayload.self)
         let input = try req.content.decode(InPost.self)
-
-        let post = Post(
-            title: input.title, 
-            content: input.content, 
-            authorId: userPayload.userId,
-            excerpt: input.excerpt, 
-            status: input.status ?? .draft,
-            publishedAt: input.status == .published ? Date() : nil
-        )
-        try await post.save(on: req.db)
+        let _ = try await postService.create(input: input, userId: userPayload.userId, req: req)
         return req.redirect(to: "/page/posts")
     }
 
@@ -73,7 +71,26 @@ struct PostPageController: RouteCollection {
 
     // 创建页
     func createPage(req: Request) async throws -> View {
-        return try await req.view.render("posts/create")
+        let payload = req.auth.get(UserPayload.self)
+
+    
+    
+
+        var user: OutUser? 
+
+
+        var context: [String: AnyEncodable] = [:]
+        if let payload, let dbuser = try await User.find(payload.userId, on: req.db) {
+            user = OutUser(user: dbuser)
+            context["user"] = AnyEncodable(value: user)
+        }
+
+        let categories = try await Category.query(on: req.db).all()
+        let tags = try await Tag.query(on: req.db).all()
+        context["categories"] = AnyEncodable(value: categories)
+        context["tags"] = AnyEncodable(value: tags)
+
+        return try await req.view.render("posts/create", context)
     }
 
     // 详情页（可选）

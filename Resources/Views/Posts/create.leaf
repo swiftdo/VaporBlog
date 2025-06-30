@@ -2,21 +2,127 @@
 #export("title"):
 创建文章
 #endexport
+
+#export("styles"):
+<style>
+
+</style>
+#endexport
+
+
 #export("body"):
-<div class="container mt-4" style="max-width: 600px;">
+<div class="container mt-5 mb-5" style="max-width: 960px;">
     <h1 class="mb-4">创建文章</h1>
-    <form method="post" action="/page/posts">
+    <form id="postForm">
         <div class="mb-3">
             <label for="title" class="form-label">标题</label>
             <input type="text" class="form-control" id="title" name="title" required>
         </div>
         <div class="mb-3">
-            <label for="content" class="form-label">内容</label>
-            <textarea class="form-control" id="content" name="content" rows="6"></textarea>
+            <label for="content" class="form-label">内容(markdown)</label>
+            <div id="markdown-container" id="content"style="height: 500px;"></div>
+        </div>
+        <div class="mb-3">
+            <label for="title" class="form-label">概要</label>
+            <input type="text" class="form-control" id="excerpt" name="excerpt" required>
         </div>
         <button type="submit" class="btn btn-primary">提交</button>
         <a href="/page/posts" class="btn btn-secondary ms-2">返回列表</a>
     </form>
 </div>
+<script>
+const cherryInstance = new Cherry({
+    id: 'markdown-container',
+    value: '# welcome to cherry editor!',
+    editor: {
+        defaultModel: 'editOnly'
+    },
+    event: {
+        afterChange: function (text, html) {
+            let content = getPlainTextFromCherryMarkdown(cherryInstance);
+            document.getElementById('excerpt').value = content; // 更新概要内容
+        }
+    }
+});
+
+function getPlainTextFromCherryMarkdown(cherryInstance, numWords = 50) {
+    if (!cherryInstance) {
+        console.warn("Cherry Markdown 实例未找到。");
+        return '';
+    }
+
+    // 1. 获取 Markdown 内容
+    const markdownContent = cherryInstance.getMarkdown();
+
+    // 2. 将 Markdown 渲染成 HTML
+    const htmlContent = cherryInstance.getHtml(markdownContent);
+
+    // 3. 从 HTML 中提取纯文本
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = htmlContent;
+    let plainText = tempDiv.textContent || tempDiv.innerText || '';
+
+    // 可选：进一步处理多余的空白符，将多个连续的空白符替换为单个空格，并去除首尾空格
+    // 这一步确保在分割单词前，文本是干净且空格规范的。
+    plainText = plainText.replace(/\s+/g, ' ').trim();
+
+    // 4. 分割成单词数组
+    // 使用正则表达式匹配一个或多个非空白字符作为单词
+    const words = plainText.match(/\S+/g) || [];
+
+    // 5. 截取前 N 个单词并重新组合
+    if (words.length <= numWords) {
+        return words.join(' ');
+    } else {
+        return words.slice(0, numWords).join(' ');
+    }
+}
+
+// 提交
+document.getElementById('postForm').onsubmit = async function(e) {
+  e.preventDefault();
+  const title = document.getElementById('title').value.trim();
+  const excerpt = document.getElementById('excerpt').value.trim();
+  const content = cherryInstance.getMarkdown();
+
+  alert(content);
+
+  try {
+    const resp = await fetch('/page/posts/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        "title": title,
+        "excerpt": excerpt,
+        "content": content,
+        "status": "published"
+     }),
+    });
+    if (resp.redirected) {
+      window.location.href = resp.url;
+      return;
+    }
+    const data = await resp.json();
+    if (!responseSuccess(data)) {
+      Swal.fire({
+        title: '失败',
+        text: data.message || '创建文章失败',
+        icon: 'error'
+      });
+    }
+  } catch {
+    showAuthMessage('网络错误，请稍后重试');
+  }
+
+
+
+
+
+}
+
+
+
+
+</script>
 #endexport
 #endextend
