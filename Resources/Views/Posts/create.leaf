@@ -69,37 +69,35 @@ const cherryInstance = new Cherry({
     event: {
         afterChange: function (text, html) {
             let content = getPlainTextFromCherryMarkdown(cherryInstance);
-            document.getElementById('excerpt').value = content; // 更新概要内容
+            $('#excerpt').val(content); // 更新概要内容
         }
     }
 });
-
+{
 function getPlainTextFromCherryMarkdown(cherryInstance, numWords = 50) {
     if (!cherryInstance) {
         console.warn("Cherry Markdown 实例未找到。");
         return '';
     }
 
-    // 1. 获取 Markdown 内容
-    const markdownContent = cherryInstance.getMarkdown();
-
     // 2. 将 Markdown 渲染成 HTML
-    const htmlContent = cherryInstance.getHtml(markdownContent);
+    const htmlContent = cherryInstance.getHtml();;
 
-    // 3. 从 HTML 中提取纯文本
+    // 3. 用 DOM 解析，移除 <a>、<code>、<pre>、<img> 等标签
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = htmlContent;
+
+    // 移除链接、代码块、内联代码、图片等
+    tempDiv.querySelectorAll('a, code, pre, img').forEach(el => el.remove());
+
+    // 只保留纯文本
     let plainText = tempDiv.textContent || tempDiv.innerText || '';
 
-    // 可选：进一步处理多余的空白符，将多个连续的空白符替换为单个空格，并去除首尾空格
-    // 这一步确保在分割单词前，文本是干净且空格规范的。
+    // 进一步处理空白符
     plainText = plainText.replace(/\s+/g, ' ').trim();
 
-    // 4. 分割成单词数组
-    // 使用正则表达式匹配一个或多个非空白字符作为单词
+    // 截取前 N 个单词
     const words = plainText.match(/\S+/g) || [];
-
-    // 5. 截取前 N 个单词并重新组合
     if (words.length <= numWords) {
         return words.join(' ');
     } else {
@@ -118,12 +116,6 @@ $('#postForm').on('submit', async function(e) {
 
   // 获取分类
   const selectedCategories = $('#categories').val();
-
-  alert(selectedTags);
-  alert(selectedCategories);
-
-
-
 
   try {
     const resp = await fetch('/page/posts/', {
