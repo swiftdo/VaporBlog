@@ -3,7 +3,12 @@
 创建文章
 #endexport
 
-#export("styles"):
+#export("headers"):
+
+<link href="/third/cherry-markdown-0.9.4/cherry-markdown.min.css" rel="stylesheet" />
+<script src="/third/cherry-markdown-0.9.4/cherry-markdown.min.js"></script>
+<script src="/third/echarts-4.6.0/echarts.js"></script>
+
 <style>
 
 </style>
@@ -59,10 +64,9 @@ $(document).ready(function() {
     $('#categories').select2({placeholder:  "请选择分类", allowClear: true});
 });
 
-
 const cherryInstance = new Cherry({
     id: 'markdown-container',
-    value: '# welcome to cherry editor!',
+    value: '# 欢迎来到 VaporBlog!',
     editor: {
         defaultModel: 'editOnly'
     },
@@ -73,6 +77,8 @@ const cherryInstance = new Cherry({
         }
     }
 });
+
+
 
 function getPlainTextFromCherryMarkdown(cherryInstance, maxLength = 150) {
     if (!cherryInstance) {
@@ -140,10 +146,6 @@ $('#postForm').on('submit', async function(e) {
     });
   }
 });
-
-
-
-
 </script>
 #endexport
 #endextend

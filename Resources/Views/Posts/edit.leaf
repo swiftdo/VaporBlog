@@ -3,6 +3,15 @@
 编辑文章
 #endexport
 
+#export("headers"):
+
+<link href="/third/cherry-markdown-0.9.4/cherry-markdown.min.css" rel="stylesheet" />
+<script src="/third/cherry-markdown-0.9.4/cherry-markdown.min.js"></script>
+<style>
+
+</style>
+#endexport
+
 #export("body"):
 <div class="container mt-4" style="max-width: 600px;">
     <h1 class="mb-4">编辑文章</h1>

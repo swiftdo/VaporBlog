@@ -1,7 +1,19 @@
 #extend("layouts/base"):
-#export("title"):查看文章#endexport
+#export("title"):
+查看文章
+#endexport
+
+#export("headers"):
+
+<link href="/third/cherry-markdown-0.9.4/cherry-markdown.min.css" rel="stylesheet" />
+<script src="/third/cherry-markdown-0.9.4/cherry-markdown.min.js"></script>
+<style>
+
+</style>
+#endexport
+
 #export("body"):
-<div class="container mt-4" style="max-width: 700px;">
+<div class="container mt-4" style="max-width: 960px;">
     <h1 class="mb-4">#(post.title)</h1>
     <article class="mb-4 p-3 bg-light rounded shadow-sm">
         <div>
@@ -13,6 +25,8 @@
         #if(post.author):
         <div class="mt-3" style="color: grey"> #(post.author.nickname)</div>
         #endif
+
+        <textarea id="markdown-data" style="display:none" >#(post.content)</textarea>
 
         <div class="mt-3" id="cherry-markdown-container"></div>
 
@@ -34,19 +48,24 @@
 </div>
 
 <script>
-const dynamicMarkdownContent = `#(post.content)`; 
 
-// 初始化 Cherry Markdown 实例，只读模式
-const cherryInstance = new Cherry({
-    id: 'cherry-markdown-container', // 容器元素的 ID
-    value: dynamicMarkdownContent, // 传入后端提供的 Markdown 内容
-    editor: {
-        defaultModel: 'previewOnly', // 只读模式
-    },
-    toolbars: {
-        showToolbar: false, // 隐藏工具栏
-    },
+$(function() {
+    // 初始化 Cherry Markdown 编辑器
+    const dynamicMarkdownContent =  $('#markdown-data').val();
+
+    // 初始化 Cherry Markdown 实例，只读模式
+    const cherryInstance = new Cherry({
+        id: 'cherry-markdown-container', // 容器元素的 ID
+        value: dynamicMarkdownContent, // 传入后端提供的 Markdown 内容
+        editor: {
+            defaultModel: 'previewOnly', // 只读模式
+        },
+        toolbars: {
+            showToolbar: false, // 隐藏工具栏
+        },
+    });
 });
+
 
 
 </script>
