@@ -14,7 +14,7 @@
 #endexport
 
 #export("body"):
-<div class="container mt-4" style="max-width: 960px;">
+<div class="container mt-4">
     <h1 class="mb-4">#(post.title)</h1>
     <article class="mb-4 p-3 bg-light rounded shadow-sm">
         <div>
@@ -66,9 +66,7 @@ $(function() {
         },
     });
 });
-
-
-
 </script>
+
 #endexport
 #endextend

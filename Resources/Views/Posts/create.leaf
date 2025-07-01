@@ -16,7 +16,7 @@
 
 
 #export("body"):
-<div class="container mt-5 mb-5" style="max-width: 960px;">
+<div class="container mt-4 mb-4">
     <h1 class="mb-4">创建文章</h1>
     <form id="postForm">
         <div class="mb-3">
@@ -49,10 +49,6 @@
                 #endfor
             </select>
         </div>
-
-        
-
-
         <button type="submit" class="btn btn-primary">提交</button>
         <a href="/page/posts" class="btn btn-secondary ms-2">返回列表</a>
     </form>

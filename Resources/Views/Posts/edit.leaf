@@ -14,21 +14,129 @@
 #endexport
 
 #export("body"):
-<div class="container mt-4" style="max-width: 600px;">
+<div class="container mt-4">
     <h1 class="mb-4">编辑文章</h1>
-    <form method="post" action="/page/posts/#(post.id)/update">
+    <form id="editForm">
         <div class="mb-3">
             <label for="title" class="form-label">标题</label>
             <input type="text" class="form-control" id="title" name="title" value="#(post.title)" required>
         </div>
+        <textarea id="markdown-data" style="display:none" >#(post.content)</textarea>
         <div class="mb-3">
             <label for="content" class="form-label">内容</label>
-            <textarea class="form-control" id="content" name="content" rows="6">#(post.content)</textarea>
+            <div id="markdown-container"></div>
         </div>
+
+        <div class="mb-3">
+            <label for="title" class="form-label">概要</label>
+            <input type="text" class="form-control" id="excerpt" name="excerpt" value="#(post.excerpt)" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="tags" class="form-label">分类</label>
+            <select class="form-select" id="categories" name="categories" multiple>
+                #for(category in categories):
+                    <option value="#(category.id)">#(category.name)</option>
+                #endfor
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="tags" class="form-label">标签</label>
+            <select class="form-select" id="tags" name="tags" multiple>
+                #for(tag in tags):
+                    <option value="#(tag.id)">#(tag.name)</option>
+                #endfor
+            </select>
+        </div>
+
         <button type="submit" class="btn btn-primary">保存修改</button>
         <a href="/page/posts" class="btn btn-secondary ms-2">返回列表</a>
     </form>
 </div>
-#endexport
 
+
+<script>
+$(document).ready(function() {
+    $('#tags').select2({placeholder:  "请选择标签", allowClear: true});
+    $('#categories').select2({placeholder:  "请选择分类", allowClear: true});
+
+    // 设置已选中的标签
+    var selectedTagIds = [
+        #for(tag in post.tags):
+            "#(tag.id)",
+        #endfor
+    ];
+    $('#tags').val(selectedTagIds).trigger('change');
+
+    // 设置已选中的分类
+    var selectedCategoryIds = [
+        #for(category in post.categories):
+            "#(category.id)",
+        #endfor
+    ];
+    $('#categories').val(selectedCategoryIds).trigger('change');
+
+});
+
+const dynamicMarkdownContent =  $('#markdown-data').val();
+
+const cherryInstance = new Cherry({
+    id: 'markdown-container',
+    value: dynamicMarkdownContent,
+    editor: {
+        defaultModel: 'editOnly'
+    },
+});
+
+$('#editForm').on('submit', async function(e) {
+    e.preventDefault();
+  const title = $('#title').val().trim();
+  const excerpt = $('#excerpt').val().trim();
+  const content = cherryInstance.getMarkdown();
+
+  // 获取标签
+  const selectedTags = $('#tags').val(); 
+
+  // 获取分类
+  const selectedCategories = $('#categories').val();
+
+  try {
+    const resp = await fetch('/page/posts/#(post.id)/update', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        "title": title,
+        "excerpt": excerpt,
+        "content": content,
+        "status": "published",
+        "tagIds": selectedTags.join(","),
+        "categoryIds": selectedCategories.join(",")
+     }),
+    });
+    if (resp.redirected) {
+      window.location.href = resp.url;
+      return;
+    }
+    const data = await resp.json();
+    if (!responseSuccess(data)) {
+      Swal.fire({
+        title: '失败',
+        text: data.message || '创建文章失败',
+        icon: 'error'
+      });
+    }
+  } catch {
+    Swal.fire({
+      title: '失败',
+      text: '网络错误，请稍后重试',
+      icon: 'error'
+    });
+  }
+
+
+});
+
+</script>
+#endexport
 #endextend

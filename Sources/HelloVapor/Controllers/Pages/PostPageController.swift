@@ -10,9 +10,9 @@ struct PostPageController: RouteCollection, @unchecked Sendable {
     }
 
     func boot(routes: any RoutesBuilder) throws {
-        let posts = routes.grouped("posts").grouped(UserAuthenticatorMiddleware())
+        let posts = routes.grouped("posts")
+            .grouped(UserAuthenticatorMiddleware())
         
-        let secure = posts.grouped(UserAuthenticatorMiddleware())
         // GET 请求：页面展示
         posts.get(use: indexPage)                // 列表页面
         posts.get("create", use: createPage)     // 创建页面
@@ -20,9 +20,9 @@ struct PostPageController: RouteCollection, @unchecked Sendable {
         posts.get(":id", "edit", use: editPage)  // 编辑页面
         
         // 数据操作
-        secure.post(use: storeAction)             // 创建资源
-        secure.post(":id", "update", use: updateAction)     // 更新资源, 因为表单不支持 put
-        secure.post(":id", "delete", use: deleteAction)   // 删除资源, 因为表单不支持 delete
+        posts.post(use: storeAction)             // 创建资源
+        posts.post(":id", "update", use: updateAction)     // 更新资源, 因为表单不支持 put
+        posts.post(":id", "delete", use: deleteAction)   // 删除资源, 因为表单不支持 delete
     }
     
     // 保存新文章
@@ -35,13 +35,29 @@ struct PostPageController: RouteCollection, @unchecked Sendable {
 
     // 更新文章
     func updateAction(req: Request) async throws -> Response {
-        guard let post = try await Post.find(req.parameters.get("id"), on: req.db) else {
+        let userPayload = try req.auth.require(UserPayload.self)
+        guard let dbuser = try await User.find(userPayload.userId, on: req.db) else {
             throw Abort(.notFound)
         }
+
+        guard let postId = req.parameters.get("id"), let uuid = UUID(uuidString: postId) else {
+            throw Abort(.notFound)
+        }
+
+        guard let post = try await Post.query(on: req.db)
+            .filter(\.$id == uuid)
+            .with(\.$author)
+            .with(\.$categories)
+            .with(\.$tags)
+            .first() else {
+            throw Abort(.notFound)
+        }
+        if post.$author.id != dbuser.id {
+            throw Abort(.forbidden, reason: "You are not allowed to edit this post.")
+        }
         let input = try req.content.decode(InPost.self)
-        post.title = input.title
-        post.content = input.content
-        try await post.save(on: req.db)
+        let _ = try await postService.update(input: input, post: post, req: req)
+
         return req.redirect(to: "/page/posts")
     }
 
@@ -126,9 +142,32 @@ struct PostPageController: RouteCollection, @unchecked Sendable {
 
     // 编辑页
     func editPage(req: Request) async throws -> View {
-        guard let post = try await Post.find(req.parameters.get("id"), on: req.db) else {
+        let payload = try req.auth.require(UserPayload.self)
+
+        guard let postId = req.parameters.get("id"), let uuid = UUID(uuidString: postId) else {
             throw Abort(.notFound)
         }
-        return try await req.view.render("posts/edit", ["post": post])
+        
+        // 查询文章
+        guard let post = try await Post.query(on: req.db)
+            .with(\.$author)
+            .with(\.$categories)
+            .with(\.$tags)
+            .filter(\.$id == uuid)
+            .first() else {
+                throw Abort(.notFound)
+            }
+        guard let dbuser = try await User.find(payload.userId, on: req.db) else {
+            throw Abort(.notFound)
+        }
+
+        var context: [String: AnyEncodable] = [:]
+        context["user"] = AnyEncodable(value: OutUser(user: dbuser))        
+        let categories = try await Category.query(on: req.db).all()
+        let tags = try await Tag.query(on: req.db).all()
+        context["categories"] = AnyEncodable(value: categories)
+        context["tags"] = AnyEncodable(value: tags)
+        context["post"] = AnyEncodable(value: OutPost(from: post))
+        return try await req.view.render("posts/edit", context)
     }
 }
