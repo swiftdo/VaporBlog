@@ -7,7 +7,7 @@
 
 <link href="/third/cherry-markdown-0.9.4/cherry-markdown.min.css" rel="stylesheet" />
 <script src="/third/cherry-markdown-0.9.4/cherry-markdown.min.js"></script>
-<script src="/third/echarts-4.6.0/echarts.js"></script>
+<script src="/third/echarts-4.6.0/echarts.min.js"></script>
 
 <style>
 
