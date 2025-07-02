@@ -14,7 +14,7 @@
 #endexport
 
 #export("body"):
-<div class="container mt-4">
+<div class="container mt-4 mb-4">
     <h1 class="mb-4">编辑文章</h1>
     <form id="editForm">
         <div class="mb-3">

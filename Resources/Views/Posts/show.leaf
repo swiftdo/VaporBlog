@@ -14,7 +14,7 @@
 #endexport
 
 #export("body"):
-<div class="container mt-4">
+<div class="container mt-4 mb-4">
     <h1 class="mb-4">#(post.title)</h1>
     <article class="mb-4 p-3 bg-light rounded shadow-sm">
         <div>
@@ -37,7 +37,7 @@
             #endfor
         </div>
     </article>
-    <div class="d-flex gap-2 mb-5">
+    <div class="d-flex gap-2">
         #if(user && post.author && post.author.id == user.id):
             <a href="/page/posts/#(post.id)/edit" class="btn btn-outline-secondary">✏️ 编辑</a>
             <form method="post" action="/page/posts/#(post.id)/delete" class="d-inline" onsubmit="return confirm('确定要删除这篇文章吗？');">

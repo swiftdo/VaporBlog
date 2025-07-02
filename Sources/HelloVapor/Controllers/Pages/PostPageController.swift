@@ -73,14 +73,29 @@ struct PostPageController: RouteCollection, @unchecked Sendable {
     // 列表页
     func indexPage(req: Request) async throws -> View {
         let payload = req.auth.get(UserPayload.self)
-        let posts = try await Post.query(on: req.db)
+        let pageReq = try req.query.decode(PageRequest.self)
+
+        let paged = try await Post.query(on: req.db)
             .with(\.$author)
             .with(\.$categories)
             .with(\.$tags)
-            .sort(\.$createdAt, .descending).all()
+            .sort(\.$createdAt, .descending)
+            .paginate(pageReq).map { 
+                OutPost(from: $0)
+            }
+
+        let startPage = max(2, pageReq.page - 2)
+        let endPage = min(paged.metadata.pageCount - 1, pageReq.page + 2)            
 
         var context: [String: AnyEncodable] = [
-            "posts": AnyEncodable(value: posts.map { OutPost(from: $0) }),
+            "items": AnyEncodable(value: paged.items),
+            "per": AnyEncodable(value: paged.metadata.per),
+            "page": AnyEncodable(value: paged.metadata.page),
+            "pageCount": AnyEncodable(value: paged.metadata.pageCount),
+            "total": AnyEncodable(value: paged.metadata.total),
+            "startPage": AnyEncodable(value: startPage),
+            "endPage": AnyEncodable(value: endPage),
+            "pageNumbers": AnyEncodable(value: Array(1...paged.metadata.pageCount))
         ]
         var user: OutUser? 
         if let payload, let dbuser = try await User.find(payload.userId, on: req.db) {
