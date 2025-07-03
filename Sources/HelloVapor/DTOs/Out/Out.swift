@@ -5,6 +5,7 @@
 //  Created by laijihua on 2025/6/5.
 //
 import Vapor
+import Fluent
 
 protocol Out: Content {}
 
@@ -62,6 +63,8 @@ struct OutEmpty: Out {
         return APIResponse<OutEmpty>(success: OutEmpty());
     }
 }
+
+extension Page: Out where T: Out  {}
 
 // 统一错误
 enum APIError : Error {

@@ -3,6 +3,38 @@ import Fluent
 
 final class PostServiceImpl: PostService { 
 
+    func list(req: Request) async throws -> Page<OutPost> {
+        return try await Post.query(on: req.db)
+            .with(\.$author)
+            .with(\.$categories)
+            .with(\.$tags)
+            .paginate(for: req)
+            .map { OutPost(from: $0) }
+    }   
+
+    func find(postId: UUID, req: Request) async throws -> Post? {
+        return try await Post.query(on: req.db)
+            .with(\.$author)
+            .with(\.$categories)
+            .with(\.$tags)
+            .filter(\.$id == postId)
+            .first()
+    }
+
+    func detail(postId: UUID, req: Request) async throws -> OutPost? {
+         // 查询文章
+        let post = try await find(postId: postId, req: req)
+        if let post {
+            return OutPost(from: post)
+        } else {
+            return nil
+        }   
+    }
+
+    func delete(post: Post, req: Request) async throws {
+        try await post.delete(on: req.db)
+    }
+
     func create(input: InPost, userId: UUID, req: Request) async throws -> OutPost {
         let post = Post(
             title: input.title, 

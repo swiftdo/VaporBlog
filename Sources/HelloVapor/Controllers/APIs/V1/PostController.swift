@@ -33,14 +33,9 @@ struct PostController: RouteCollection, @unchecked Sendable {
 
 
     // 看所有文章
-    func index(req: Request) async throws -> APIResponse<[OutPost]> {
-        let posts = try await Post.query(on: req.db)
-            .with(\.$author)
-            .with(\.$categories)
-            .with(\.$tags)
-            .all()
-        let out = posts.map { OutPost(from: $0) }
-        return APIResponse(success: out)
+    func index(req: Request) async throws -> APIResponse<Page<OutPost>> {
+        let paged = try await postService.list(req: req)
+        return APIResponse(success: paged)
     }
 
     // 新建文章
@@ -59,15 +54,10 @@ struct PostController: RouteCollection, @unchecked Sendable {
     func show(req: Request) async throws -> APIResponse<OutPost> {
         guard let postId = req.parameters.get("postID"),
             let uuid = UUID(uuidString: postId),
-            let post = try await Post.query(on: req.db)
-                .with(\.$author)
-                .with(\.$categories)
-                .with(\.$tags)
-                .filter(\.$id == uuid)
-                .first() else {
+            let post = try await postService.detail(postId: uuid, req: req) else {
             throw APIError.notFound(msg: "文章不存在")
         }
-        return APIResponse(success: OutPost(from: post))
+        return APIResponse(success: post)
     }
 
     // 修改
@@ -77,10 +67,8 @@ struct PostController: RouteCollection, @unchecked Sendable {
         }
         try InPost.validate(content: req)
         let input = try req.content.decode(InPost.self)
-        post.title = input.title
-        post.content = input.content
-        try await post.update(on: req.db)
-        return APIResponse(success: OutPost(from: post))
+        let output = try await postService.update(input: input, post: post, req: req)
+        return APIResponse(success: output)
     }
 
     // 删除
@@ -88,7 +76,7 @@ struct PostController: RouteCollection, @unchecked Sendable {
         guard let post = try await Post.find(req.parameters.get("postID"), on: req.db) else {
             throw APIError.notFound(msg: "文章不存在")
         }
-        try await post.delete(on: req.db)
+        try await postService.delete(post: post, req: req)
         return OutEmpty.ok(msg: "删除成功")
     }
 }

@@ -44,17 +44,13 @@ struct PostPageController: RouteCollection, @unchecked Sendable {
             throw Abort(.notFound)
         }
 
-        guard let post = try await Post.query(on: req.db)
-            .filter(\.$id == uuid)
-            .with(\.$author)
-            .with(\.$categories)
-            .with(\.$tags)
-            .first() else {
+        guard let post = try await postService.find(postId: uuid, req: req) else {
             throw Abort(.notFound)
         }
         if post.$author.id != dbuser.id {
             throw Abort(.forbidden, reason: "You are not allowed to edit this post.")
         }
+
         let input = try req.content.decode(InPost.self)
         let _ = try await postService.update(input: input, post: post, req: req)
 
@@ -66,23 +62,17 @@ struct PostPageController: RouteCollection, @unchecked Sendable {
         guard let post = try await Post.find(req.parameters.get("id"), on: req.db) else {
             throw Abort(.notFound)
         }
-        try await post.delete(on: req.db)
+        try await postService.delete(post: post, req: req)
         return req.redirect(to: "/page/posts")
     }
 
     // 列表页
     func indexPage(req: Request) async throws -> View {
         let payload = req.auth.get(UserPayload.self)
-        let pageReq = try req.query.decode(PageRequest.self)
 
-        let paged = try await Post.query(on: req.db)
-            .with(\.$author)
-            .with(\.$categories)
-            .with(\.$tags)
-            .sort(\.$createdAt, .descending)
-            .paginate(pageReq).map { 
-                OutPost(from: $0)
-            }
+
+        let pageReq = try req.query.decode(PageRequest.self)
+        let paged = try await postService.list(req: req)
 
         let startPage = max(2, pageReq.page - 2)
         let endPage = min(paged.metadata.pageCount - 1, pageReq.page + 2)            
@@ -102,7 +92,6 @@ struct PostPageController: RouteCollection, @unchecked Sendable {
             user = OutUser(user: dbuser)
             context["user"] = AnyEncodable(value: user)
         }
-        
         return try await req.view.render("posts/index", context)
     }
 
@@ -132,24 +121,15 @@ struct PostPageController: RouteCollection, @unchecked Sendable {
             user = OutUser(user: dbuser)
             context["user"] = AnyEncodable(value: user)
         }
-
-
         guard let postId = req.parameters.get("id"), let uuid = UUID(uuidString: postId) else {
             throw Abort(.notFound)
         }
         
         // 查询文章
-        guard let post = try await Post.query(on: req.db)
-            .with(\.$author)
-            .with(\.$categories)
-            .with(\.$tags)
-            .filter(\.$id == uuid)
-            .first() else {
-                throw Abort(.notFound)
-            }
-
-        context["post"] = AnyEncodable(value: OutPost(from: post))
-
+        guard let post = try await postService.detail(postId: uuid, req: req) else {
+            throw Abort(.notFound)
+        }
+        context["post"] = AnyEncodable(value: post)
         // 渲染视图
         return try await req.view.render("posts/show", context)
         
@@ -164,14 +144,10 @@ struct PostPageController: RouteCollection, @unchecked Sendable {
         }
         
         // 查询文章
-        guard let post = try await Post.query(on: req.db)
-            .with(\.$author)
-            .with(\.$categories)
-            .with(\.$tags)
-            .filter(\.$id == uuid)
-            .first() else {
-                throw Abort(.notFound)
-            }
+        guard let post = try await postService.detail(postId: uuid, req: req) else {
+            throw Abort(.notFound)
+        }
+
         guard let dbuser = try await User.find(payload.userId, on: req.db) else {
             throw Abort(.notFound)
         }
@@ -182,7 +158,7 @@ struct PostPageController: RouteCollection, @unchecked Sendable {
         let tags = try await Tag.query(on: req.db).all()
         context["categories"] = AnyEncodable(value: categories)
         context["tags"] = AnyEncodable(value: tags)
-        context["post"] = AnyEncodable(value: OutPost(from: post))
+        context["post"] = AnyEncodable(value: post)
         return try await req.view.render("posts/edit", context)
     }
 }
