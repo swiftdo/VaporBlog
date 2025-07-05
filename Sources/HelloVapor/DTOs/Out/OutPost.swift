@@ -12,6 +12,7 @@ struct OutPost: Out {
     let title: String
     let content: String
     let createdAt: Date?
+    let viewsCount: Int // 添加文章阅读量
     let updatedAt: Date?
     let authorId: UUID
     let excerpt: String?
@@ -30,6 +31,7 @@ struct OutPost: Out {
         self.authorId = post.$author.id
         self.excerpt = post.excerpt
         self.status = post.status
+        self.viewsCount = post.viewsCount
 
         if let user = post.$author.value {
             self.author = OutUser(user: user)

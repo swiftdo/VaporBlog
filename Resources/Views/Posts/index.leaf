@@ -25,6 +25,7 @@
                         #if(post.author):
                         <span> #(post.author.nickname)</span>
                         #endif
+                        <span class="ms-2 text-muted" style="font-size: 0.9em;">👁️ #(post.viewsCount)</span>
                     </div>
                 
                     #if(post.excerpt):

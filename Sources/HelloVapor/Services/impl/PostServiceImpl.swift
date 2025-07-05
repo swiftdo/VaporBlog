@@ -8,6 +8,7 @@ final class PostServiceImpl: PostService {
             .with(\.$author)
             .with(\.$categories)
             .with(\.$tags)
+            .sort(\.$createdAt, .descending)
             .paginate(for: req)
             .map { OutPost(from: $0) }
     }   
@@ -21,10 +22,15 @@ final class PostServiceImpl: PostService {
             .first()
     }
 
-    func detail(postId: UUID, req: Request) async throws -> OutPost? {
+    func detail(postId: UUID, req: Request, viewCountIns: Bool = false) async throws -> OutPost? {
          // 查询文章
         let post = try await find(postId: postId, req: req)
         if let post {
+            if viewCountIns {
+                // 添加文章浏览量
+                post.viewsCount += 1
+                try await post.save(on: req.db)
+            }
             return OutPost(from: post)
         } else {
             return nil

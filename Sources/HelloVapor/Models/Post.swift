@@ -13,18 +13,7 @@ final class Post: Model, Content, @unchecked Sendable {
     // 定义数据库表名，Vapor/Fluent 会自动识别并操作这张表
     static let schema = "posts"
     
-    enum FieldKeys {
-        static let title: FieldKey = "title"
-        static let content: FieldKey = "content"
-        static let createdAt: FieldKey = "created_at"
-        static let updatedAt: FieldKey = "updated_at"
-
-        static let authorId: FieldKey = "author_id" // 关联用户的外键
-        static let excerpt: FieldKey = "excerpt" // 文章摘要
-        static let status: FieldKey = "status" // 文章状态
-        static let viewsCount: FieldKey = "views_count" // 文章浏览量
-        static let publishedAt: FieldKey = "published_at" // 文章发布时间
-    }
+    
 
     // MARK: - 数据库字段定义
 
@@ -36,8 +25,6 @@ final class Post: Model, Content, @unchecked Sendable {
 
     @Parent(key: FieldKeys.authorId)
     var author: User // 关联到 `User` 模型，表示文章的作者
-
-    
 
     /// 文章标题字段，使用 `@Field` 宏。
     @Field(key: FieldKeys.title)
@@ -112,5 +99,18 @@ extension Post {
         case draft = "draft" // 草稿
         case published = "published" // 已发布
         case archived = "archived" // 已归档
+    }
+
+    enum FieldKeys {
+        static let title: FieldKey = "title" // 标题
+        static let content: FieldKey = "content" // 内容
+        static let createdAt: FieldKey = "created_at"
+        static let updatedAt: FieldKey = "updated_at"
+
+        static let authorId: FieldKey = "author_id" // 关联用户的外键
+        static let excerpt: FieldKey = "excerpt" // 文章摘要
+        static let status: FieldKey = "status" // 文章状态
+        static let viewsCount: FieldKey = "views_count" // 文章浏览量
+        static let publishedAt: FieldKey = "published_at" // 文章发布时间
     }
 }

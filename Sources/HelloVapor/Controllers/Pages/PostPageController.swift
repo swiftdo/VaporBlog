@@ -125,8 +125,8 @@ struct PostPageController: RouteCollection, @unchecked Sendable {
             throw Abort(.notFound)
         }
         
-        // 查询文章
-        guard let post = try await postService.detail(postId: uuid, req: req) else {
+        // 查询文章，增加阅读量
+        guard let post = try await postService.detail(postId: uuid, req: req, viewCountIns: true) else {
             throw Abort(.notFound)
         }
         context["post"] = AnyEncodable(value: post)
