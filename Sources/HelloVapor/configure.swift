@@ -65,6 +65,7 @@ private func migrations(_ app: Application) throws {
     // 添加初始数据迁移
     app.migrations.add(SeedInitialTag())
     app.migrations.add(SeedInitialCategory())
+    app.migrations.add(AddParentIdToComment())
 }
 
 // 数据库配置

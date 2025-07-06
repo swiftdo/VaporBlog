@@ -54,7 +54,7 @@ struct PostController: RouteCollection, @unchecked Sendable {
     func show(req: Request) async throws -> APIResponse<OutPost> {
         guard let postId = req.parameters.get("postID"),
             let uuid = UUID(uuidString: postId),
-            let post = try await postService.detail(postId: uuid, req: req) else {
+            let post = try await postService.detail(postId: uuid, req: req, viewCountIns: true, withComment: true) else {
             throw APIError.notFound(msg: "文章不存在")
         }
         return APIResponse(success: post)

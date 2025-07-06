@@ -20,9 +20,10 @@ struct OutPost: Out {
     let author: OutUser?
     let categories: [OutCategory]
     let tags: [OutTag]
+    let comments: [OutComment]
     
     // 专业推荐：DTO 层负责转换，解耦模型
-    init(from post: Post) {
+    init(from post: Post, comments: [OutComment] = []) {
         self.id = post.id!
         self.title = post.title
         self.content = post.content
@@ -50,5 +51,6 @@ struct OutPost: Out {
         } else {
             self.tags = []
         }
+        self.comments = comments     
     }
 }

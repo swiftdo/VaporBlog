@@ -41,6 +41,22 @@
             #endfor
         </div>
     </article>
+
+    <div class="mt-4">
+    <h5>评论</h5>
+    #if(post.comments.count > 0):
+        #for(comment in post.comments):
+            <div class="border-bottom py-2">
+                <b>#(comment.user.nickname)</b>
+                <span class="text-muted" style="font-size:0.9em;">#relativeDate(comment.createdAt)</span>
+                <div>#(comment.content)</div>
+            </div>
+        #endfor
+    #else:
+        <div class="text-muted">暂无评论</div>
+    #endif
+    </div>
+
     <div class="d-flex gap-2">
         #if(user && post.author && post.author.id == user.id):
             <a href="/page/posts/#(post.id)/edit" class="btn btn-outline-secondary">✏️ 编辑</a>

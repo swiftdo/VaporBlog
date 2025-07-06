@@ -14,27 +14,71 @@ final class PostServiceImpl: PostService {
     }   
 
     func find(postId: UUID, req: Request) async throws -> Post? {
-        return try await Post.query(on: req.db)
+        return try await find(postId: postId, req: req, withComment: false)
+    }
+
+    func find(postId: UUID, req: Request, withComment: Bool) async throws -> Post? {
+        let query =  Post.query(on: req.db)
             .with(\.$author)
             .with(\.$categories)
             .with(\.$tags)
             .filter(\.$id == postId)
-            .first()
+
+        if withComment {
+            query.with(\.$comments) { comment in
+                comment.with(\.$author)
+            }
+        }
+        return try await query.first()
     }
 
-    func detail(postId: UUID, req: Request, viewCountIns: Bool = false) async throws -> OutPost? {
+    func detail(postId: UUID, req: Request, viewCountIns: Bool = false, withComment: Bool = false) async throws -> OutPost? {
          // 查询文章
-        let post = try await find(postId: postId, req: req)
+        let post = try await find(postId: postId, req: req, withComment: withComment)
+
         if let post {
             if viewCountIns {
                 // 添加文章浏览量
                 post.viewsCount += 1
                 try await post.save(on: req.db)
             }
-            return OutPost(from: post)
+            var comments = [OutComment]()
+
+            if withComment {
+                comments = try arrangeComments(comments: post.comments, req: req)
+            }
+            return OutPost(from: post, comments: comments)
         } else {
             return nil
         }   
+    }
+
+    private func arrangeComments(comments: [Comment], req: Request) throws -> [OutComment] { 
+        var commentsRes = [OutComment]()
+
+        var replays: [UUID: [OutComment]] = [:]
+
+        for childCom in comments {
+            if let childParent = childCom.parent {
+                let childParentId = try childParent.requireID()
+                if let tmpReplays = replays[childParentId] {
+                    replays[childParentId] = tmpReplays + [OutComment(from: childCom)]
+                } else {
+                    replays[childParentId] = [OutComment(from: childCom)]
+                }   
+            }
+        }
+
+        // 获取到评论
+        for comment in comments {
+            if comment.parent == nil {
+                let tmpReplays = try replays[comment.requireID()]
+                let commentRes = OutComment(from: comment, replies: tmpReplays ?? [])
+                commentsRes.append(commentRes)
+            }
+        }
+        return commentsRes
+    
     }
 
     func delete(post: Post, req: Request) async throws {
