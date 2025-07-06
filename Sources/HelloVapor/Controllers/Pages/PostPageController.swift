@@ -4,9 +4,11 @@ import Fluent
 struct PostPageController: RouteCollection, @unchecked Sendable {
 
     let postService: any PostService
+    let commentService: any CommentService
 
-    init(postService: any PostService) {
+    init(postService: any PostService, commentService: any CommentService) {
         self.postService = postService
+        self.commentService = commentService
     }
 
     func boot(routes: any RoutesBuilder) throws {
@@ -23,6 +25,61 @@ struct PostPageController: RouteCollection, @unchecked Sendable {
         posts.post(use: storeAction)             // 创建资源
         posts.post(":id", "update", use: updateAction)     // 更新资源, 因为表单不支持 put
         posts.post(":id", "delete", use: deleteAction)   // 删除资源, 因为表单不支持 delete
+
+        posts.post(":id", "comment", use: postAddComment) // 添加评论
+        posts.post(":id", "comments", ":commentId", "reply", use: postCommentAddReply) 
+
+    }
+
+    private func postAddComment(req: Request) async throws -> Response {
+        let userPayload = try req.auth.require(UserPayload.self)
+        // 获取到这个用户，判断是否有评论权限，判断是否被禁
+        guard let dbuser = try await User.find(userPayload.userId, on: req.db) else {
+            throw Abort(.notFound)
+        }
+
+        guard let postId = req.parameters.get("id"), let postUuid = UUID(uuidString: postId) else {
+            throw Abort(.notFound)
+        }
+
+        guard let post = try await postService.find(postId: postUuid, req: req) else {
+            throw Abort(.notFound)
+        }
+
+        let input = try req.content.decode(InComment.self)
+
+        let _ = try await commentService.create(input: input, for: post, user: dbuser, req: req)
+
+        return req.redirect(to: "/page/posts/\(postId)")
+    }
+    
+    private func postCommentAddReply(req: Request) async throws -> Response {
+        let userPayload = try req.auth.require(UserPayload.self)
+        guard let dbuser = try await User.find(userPayload.userId, on: req.db) else {
+            throw Abort(.notFound)
+        }
+
+        guard let postId = req.parameters.get("id"), let postUuid = UUID(uuidString: postId) else {
+            throw Abort(.notFound)
+        }
+
+        guard let post = try await postService.find(postId: postUuid, req: req) else {
+            throw Abort(.notFound)
+        }
+
+        guard let commentId = req.parameters.get("commentId"), let commentUuid = UUID(uuidString: commentId) else {
+            throw Abort(.notFound)
+        }
+
+        guard let comment = try await commentService.find(id: commentUuid, req: req) else {
+            throw Abort(.notFound)
+        }
+
+         let input = try req.content.decode(InComment.self)
+    
+        let _ = try await commentService
+            .addReply(input: input, for: post, user: dbuser, comment: comment, req: req)
+        return req.redirect(to: "/page/posts/\(postId)")
     }
     
     // 保存新文章
@@ -126,7 +183,7 @@ struct PostPageController: RouteCollection, @unchecked Sendable {
         }
         
         // 查询文章，增加阅读量
-        guard let post = try await postService.detail(postId: uuid, req: req, viewCountIns: true) else {
+        guard let post = try await postService.detail(postId: uuid, req: req, viewCountIns: true, withComment: true) else {
             throw Abort(.notFound)
         }
         context["post"] = AnyEncodable(value: post)

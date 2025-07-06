@@ -44,7 +44,7 @@ final class Comment: Model, Content, @unchecked Sendable {
 
     init() {}
 
-    init(id: UUID? = nil, postId: UUID, authorId: UUID, content: String, status: Status = .pending, parentId: UUID? = nil) {
+    init(id: UUID? = nil, postId: UUID, authorId: UUID, content: String, status: Status = .approved, parentId: UUID? = nil) {
         self.id = id
         self.$post.id = postId
         self.$author.id = authorId

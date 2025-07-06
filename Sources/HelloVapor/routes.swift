@@ -18,6 +18,7 @@ func routes(_ app: Application) throws {
 
     let authService: any AuthService = AuthServiceImpl()
     let postService: any PostService = PostServiceImpl()
+    let commentService: any CommentService = CommentServiceImpl()
 
     // MARK-API控制器
     try app.group("api") { api in
@@ -32,7 +33,7 @@ func routes(_ app: Application) throws {
 
     // MARK-页面控制器
     try app.grouped(app.sessions.middleware).group("page") { page in
-        try page.register(collection: PostPageController(postService: postService))
+        try page.register(collection: PostPageController(postService: postService, commentService: commentService))
         try page.register(collection: AuthPageController(authService: authService, app: app))
         try page.register(collection: UserPageController())
     }
