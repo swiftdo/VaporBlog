@@ -70,6 +70,17 @@
                     <textarea name="content" class="form-control mb-2" rows="2" placeholder="回复内容..." required></textarea>
                     <button type="submit" class="btn btn-secondary btn-sm">提交回复</button>
                 </form>
+                #if(comment.replies && count(comment.replies) > 0):
+                    <div class="ms-4 mt-2">
+                        #for(reply in comment.replies):
+                            <div class="border-bottom py-2">
+                                <b>#(reply.author.nickname)</b>
+                                <span class="text-muted" style="font-size:0.9em;">#relativeDate(reply.createdAt)</span>
+                                <div>#(reply.content)</div>
+                            </div>
+                        #endfor
+                    </div>
+                #endif
             </div>
         #endfor
     #else:
