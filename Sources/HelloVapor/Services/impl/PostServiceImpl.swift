@@ -53,14 +53,11 @@ final class PostServiceImpl: PostService {
         }   
     }
 
-    private func arrangeComments(comments: [Comment], req: Request) throws -> [OutComment] { 
-        var commentsRes = [OutComment]()
-
+    private func arrangeComments(comments: [Comment], req: Request) throws -> [OutComment] {        
         var replays: [UUID: [OutComment]] = [:]
 
         for childCom in comments {
-            if let childParent = childCom.parent {
-                let childParentId = try childParent.requireID()
+            if let childParentId = childCom.$parent.id {
                 if let tmpReplays = replays[childParentId] {
                     replays[childParentId] = tmpReplays + [OutComment(from: childCom)]
                 } else {
@@ -69,10 +66,12 @@ final class PostServiceImpl: PostService {
             }
         }
 
+        var commentsRes = [OutComment]()
         // 获取到评论
         for comment in comments {
-            if comment.parent == nil {
-                let tmpReplays = try replays[comment.requireID()]
+            if comment.$parent.id == nil {
+                let commentId = try comment.requireID()
+                let tmpReplays = replays[commentId]
                 let commentRes = OutComment(from: comment, replies: tmpReplays ?? [])
                 commentsRes.append(commentRes)
             }

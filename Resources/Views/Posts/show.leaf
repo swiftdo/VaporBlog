@@ -58,12 +58,18 @@
     </div>
 
     <div class="mt-3 border rounded p-3 bg-white">
-    #if(post.comments.count > 0):
+    #if(count(post.comments) > 0):
         #for(comment in post.comments):
             <div class="border-bottom py-2">
-                <b>#(comment.user.nickname)</b>
+                <b>#(comment.author.nickname)</b>
                 <span class="text-muted" style="font-size:0.9em;">#relativeDate(comment.createdAt)</span>
                 <div>#(comment.content)</div>
+                <button class="btn btn-link btn-sm p-0 reply-btn" data-comment="#(comment.id)">评论</button>
+                <form class="reply-form mt-2 d-none" id="reply-form-#(comment.id)">
+                    <input type="hidden" name="parentID" value="#(comment.id)">
+                    <textarea name="content" class="form-control mb-2" rows="2" placeholder="回复内容..." required></textarea>
+                    <button type="submit" class="btn btn-secondary btn-sm">提交回复</button>
+                </form>
             </div>
         #endfor
     #else:
@@ -100,20 +106,26 @@ $(function() {
         },
     });
 
+    // 展开/收起回复表单
+    $('.reply-btn').on('click', function() {
+        var cid = $(this).data('comment');
+        $('#reply-form-' + cid).toggleClass('d-none');
+    });
 
-    $('#post-comment').on('submit', function (e) {
+
+    $('#post-comment').on('submit', async function (e) {
         e.preventDefault();
 
         var content = $('#post-comment-content').val();
 
         // 发表评论
         try {
-            const resp = await fetch('/page/posts/#(post.id)/comment', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                "content": content
-            }),
+            const resp = await fetch('/page/posts/#(post.id)/comment',  {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    "content": content
+                }),
             });
             if (resp.redirected) {
                 window.location.href = resp.url;
@@ -126,6 +138,44 @@ $(function() {
                     text: data.message || '创建文章失败',
                     icon: 'error'
                 });
+            }
+        } catch {
+            Swal.fire({
+                title: '失败',
+                text: '网络错误，请稍后重试',
+                icon: 'error'
+            });
+        }
+    });
+
+    $('.reply-form').on('submit', async function(e) {
+        e.preventDefault();
+        var $form = $(this);
+        var parentID = $form.find('input[name="parentID"]').val();
+        var content = $form.find('textarea[name="content"]').val();
+
+        try {
+            const resp = await fetch(`/page/posts/#(post.id)/comments/${parentID}/reply`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    content: content,
+                }),
+            });
+            if (resp.redirected) {
+                window.location.href = resp.url;
+                return;
+            }
+            const data = await resp.json();
+            if (!responseSuccess(data)) {
+                Swal.fire({
+                    title: '失败',
+                    text: data.message || '回复失败',
+                    icon: 'error'
+                });
+            } else {
+                // 回复成功后刷新页面或动态插入新回复
+                window.location.reload();
             }
         } catch {
             Swal.fire({

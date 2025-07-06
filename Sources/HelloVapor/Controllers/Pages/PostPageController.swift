@@ -81,7 +81,7 @@ struct PostPageController: RouteCollection, @unchecked Sendable {
             .addReply(input: input, for: post, user: dbuser, comment: comment, req: req)
         return req.redirect(to: "/page/posts/\(postId)")
     }
-    
+
     // 保存新文章
     func storeAction(req: Request) async throws -> Response {
         let userPayload = try req.auth.require(UserPayload.self)
@@ -126,8 +126,6 @@ struct PostPageController: RouteCollection, @unchecked Sendable {
     // 列表页
     func indexPage(req: Request) async throws -> View {
         let payload = req.auth.get(UserPayload.self)
-
-
         let pageReq = try req.query.decode(PageRequest.self)
         let paged = try await postService.list(req: req)
 
