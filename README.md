@@ -7,7 +7,6 @@
 
 ## supervisor 
 
-```
 
 ```conf
 # /etc/supervisor/conf.d/vaporblog-oldbird-run.conf
@@ -20,4 +19,39 @@ user=root
 stdout_logfile=/var/log/supervisor/%(program_name)-stdout.log
 stderr_logfile=/var/log/supervisor/%(program_name)-stderr.log
 ```
+
+## 功能规划
+
+* 前端 
+  * [x] 文章、分类、标签
+  * [ ] 引入 markdown 编辑器，传值问题，隐藏 id
+  * [ ] 实现分页
+  * [ ] 文章阅读量
+  * [ ] 文章添加评论
+  * [ ] 评论添加回复功能
+  * [ ] 文章显示时间，tag
+  * [ ] tag 对应的文章列表
+  * [ ] category 对应的文章列表
+  * [ ] 文章搜索
+  * [ ] 站点用户访问统计
+  * [ ] 通知消息中心
+  * [ ] 意见反馈
+  * [ ] 文章支持收藏和点赞
+  * [ ] 个人中心，个人资料编辑
+  * [ ] 我的收藏，我的评论，我的文章，我的点赞文章
+  * [ ] 举报功能
+* 后端管理平台
+  * [ ] 用户管理
+  * [ ] 登录
+  * [ ] 角色 权限 菜单管理
+  * [ ] 分类管理
+  * [ ] 标签管理
+  * [ ] 文章管理
+  * [ ] 评论管理
+  * [ ] 友情链接管理
+  * [ ] 站点配置管理
+  * [ ] 统计分析
+  * [ ] 独立文件系统，基于 gitlab 实现文章文件管理
+  
+
 
