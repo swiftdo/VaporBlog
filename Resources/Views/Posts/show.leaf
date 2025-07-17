@@ -19,6 +19,7 @@
                     <h1 class="fw-bolder mb-1">#(post.title)</h1>
                     <div class="text-muted fst-italic mb-2">
                         发布于 #date(post.createdAt, "yyyy-MM-dd") by #(post.author.nickname)
+                        <span class="ms-3">👁️ #(post.viewsCount)</span>
                     </div>
                     <div>
                         #for(category in post.categories):
