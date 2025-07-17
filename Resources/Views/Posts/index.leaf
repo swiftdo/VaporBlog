@@ -3,73 +3,75 @@
 #export("title"):
 文章列表
 #endexport
+
 #export("body"):
-    <div class="container mt-4 mb-4">
-        <h1 class="mb-4">所有文章</h1>
-
+<div class="container mt-4 mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>所有文章</h1>
         #if(user):
-            <a href="/page/posts/create" class="btn btn-primary mb-3">➕ 创建新文章</a>
-        #else:
-        #endif
-        <ul class="list-group">
-        #for(post in items):
-            <li class="list-group-item d-flex justify-content-between align-items-center p-4">
-                <div>
-
-                    <div>
-                    #if(post.author):
-                        <span>#(post.author.nickname)</span>
-                        #endif
-                        <span class="ms-2 text-muted" style="font-size: 0.9em;">👁️ #(post.viewsCount)</span>
-                        <span class="ms-2 text-muted" style="font-size: 0.9em;">🕜 #relativeDate(post.createdAt)</span>
-                    </div>
-                    <div>
-                        #for(category in post.categories):
-                            <span class="badge bg-primary me-1">#(category.name)</span>
-                        #endfor
-
-                        
-                    </div>
-                
-                    <div><a href="/page/posts/#(post.id)" class="fw-bold fs-4">#(post.title)</a></div>
-                
-                    #if(post.excerpt):
-                       <div style="color: grey">#(post.excerpt)</div>
-                    #endif
-
-                    <div>
-                        #for(tag in post.tags):
-                            <span class="badge bg-secondary me-1">#(tag.name)</span>
-                        #endfor
-                    </div>
-                </div>
-                
-            </li>
-        #endfor
-        </ul>
-
-        #if(pageCount > 1):
-        <nav>
-            <ul class="pagination justify-content-center mt-4">
-                #if(page > 1):
-                <li class="page-item">
-                    <a class="page-link" href="?page=#(page-1)">上一页</a>
-                </li>
-                #endif
-                #for(i in pageNumbers):
-                <li class="page-item#if(i == page): active#endif">
-                    <a class="page-link" href="?page=#(i)">#(i)</a>
-                </li>
-                #endfor
-                #if(page < pageCount):
-                <li class="page-item">
-                    <a class="page-link" href="?page=#(page+1)">下一页</a>
-                </li>
-                #endif
-            </ul>
-        </nav>
+            <a href="/page/posts/create" class="btn btn-primary">➕ 创建新文章</a>
         #endif
     </div>
+
+    <div class="row">
+        #for(post in items):
+        <div class="col-md-12 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body d-flex flex-column">
+                    <h4 class="card-title"><a href="/page/posts/#(post.id)" class="text-decoration-none text-dark">#(post.title)</a></h4>
+                    <div class="text-muted mb-2" style="font-size: 0.9em;">
+                        #if(post.author):
+                            <span>✍️ #(post.author.nickname)</span>
+                        #endif
+                        <span class="ms-3">🕜 #relativeDate(post.createdAt)</span>
+                        <span class="ms-3">👁️ #(post.viewsCount)</span>
+                    </div>
+                    
+                    #if(post.excerpt):
+                    <p class="card-text text-secondary">#(post.excerpt)</p>
+                    #endif
+
+                    <div class="mt-auto">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                #for(category in post.categories):
+                                    <span class="badge bg-primary me-1">#(category.name)</span>
+                                #endfor
+                                #for(tag in post.tags):
+                                    <span class="badge bg-secondary me-1">#(tag.name)</span>
+                                #endfor
+                            </div>
+                            <a href="/page/posts/#(post.id)" class="btn btn-outline-primary btn-sm">阅读全文 &rarr;</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        #endfor
+    </div>
+
+    #if(pageCount > 1):
+    <nav>
+        <ul class="pagination justify-content-center mt-4">
+            #if(page > 1):
+            <li class="page-item">
+                <a class="page-link" href="?page=#(page-1)">上一页</a>
+            </li>
+            #endif
+            #for(i in pageNumbers):
+            <li class="page-item#if(i == page): active#endif">
+                <a class="page-link" href="?page=#(i)">#(i)</a>
+            </li>
+            #endfor
+            #if(page < pageCount):
+            <li class="page-item">
+                <a class="page-link" href="?page=#(page+1)">下一页</a>
+            </li>
+            #endif
+        </ul>
+    </nav>
+    #endif
+</div>
 #endexport
 
 #endextend
