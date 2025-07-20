@@ -2,10 +2,7 @@ import LeafKit
 import Foundation
 
 struct RelativeDateTag: LeafTag {
-    func render(_ ctx: LeafContext) throws -> LeafData {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
-        
+    func render(_ ctx: LeafContext) throws -> LeafData {    
         guard let dateAsDouble = ctx.parameters.first?.double else {
             throw LeafError(.unknownError("Unable to convert parameter to double for date"))
         }
