@@ -34,7 +34,7 @@
 
             <!-- Comments Section -->
             <section class="mb-5">
-                <div class="card bg-light">
+                <div class="card">
                     <div class="card-body">
                         <h5 class="card-title mb-4">评论区</h5>
                         #if(user):
