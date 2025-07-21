@@ -8,9 +8,7 @@
 <link href="/third/cherry-markdown-0.9.4/cherry-markdown.min.css" rel="stylesheet" />
 <script src="/third/cherry-markdown-0.9.4/cherry-markdown.min.js"></script>
 <script src="/third/echarts-4.6.0/echarts.min.js"></script>
-<style>
 
-</style>
 #endexport
 
 #export("body"):
@@ -50,8 +48,8 @@
             </select>
         </div>
 
-        <button type="submit" class="btn btn-dark">保存修改</button>
-        <a href="/page/posts" class="btn btn-secondary ms-2">返回列表</a>
+        <button type="submit" class="btn btn-primary">保存修改</button>
+        <a href="/page/posts" class="btn btn-outline-secondary ms-2">返回列表</a>
     </form>
 </div>
 

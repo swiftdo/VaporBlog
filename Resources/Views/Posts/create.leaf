@@ -9,7 +9,6 @@
 <script src="/third/cherry-markdown-0.9.4/cherry-markdown.min.js"></script>
 <script src="/third/echarts-4.6.0/echarts.min.js"></script>
 
-
 #endexport
 
 
@@ -47,8 +46,8 @@
                 #endfor
             </select>
         </div>
-        <button type="submit" class="btn btn-dark">提交</button>
-        <a href="/page/posts" class="btn btn-secondary ms-2">返回列表</a>
+        <button type="submit" class="btn btn-primary">提交</button>
+        <a href="/page/posts" class="btn btn-outline-secondary ms-2">返回列表</a>
     </form>
 </div>
 <script>
