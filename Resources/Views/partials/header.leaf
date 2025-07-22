@@ -12,14 +12,26 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarContent">
         <ul class="navbar-nav ms-auto">
-            <li class="nav-item">
-                <a class="nav-link" href="/me">关于我们</a>
+            <li class="nav-item me-3">
+                <a class="nav-link" href="/page/posts"><i class="ri-home-line me-1"></i>首页</a>
+            </li>
+            <li class="nav-item me-3">
+                <a class="nav-link" href="/page/posts"><i class="ri-article-line me-1"></i>文章</a>
+            </li>
+            <li class="nav-item me-3">
+                <a class="nav-link" href="/page/users"><i class="ri-group-line me-1"></i>作者</a>
+            </li>
+            <li class="nav-item me-3">
+                <a class="nav-link" href="/me"><i class="ri-global-line me-1"></i>站长</a>
             </li>
 
             #if(user):
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="userMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    #(user.name)
+            <li class="nav-item ms-3">
+                <a class="btn btn-primary btn-sm text-white" href="/page/posts/create"><i class="ri-edit-line me-1 text-white"></i>开始写作</a>
+            </li>
+            <li class="nav-item dropdown ms-3">
+                <a class="nav-link" href="#" id="userMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <span class="user-avatar-initial">#firstLetter(user.nickname)</span>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
                   <li>

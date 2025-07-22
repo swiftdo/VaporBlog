@@ -4,13 +4,35 @@
 文章列表
 #endexport
 
+#export("rightSide"):
+<div class="text-center py-5 mb-4 bg-light rounded">
+        <h1 class="display-2 fw-bold hero-title">技术思考的<br>聚集地</h1>
+        <p class="lead text-secondary fw-normal">汇聚优秀的技术文章，分享深度的编程见解，<br>在这里与技术大脑进行思想碰撞</p>
+        <div class="d-flex justify-content-center mt-4">
+            <div class="px-3 border-end">
+                <div class="fs-4 fw-bold">123</div>
+                <div class="text-muted">精品文章</div>
+            </div>
+            <div class="px-3 border-end">
+                <div class="fs-4 fw-bold">45</div>
+                <div class="text-muted">技术作者</div>
+            </div>
+            <div class="px-3">
+                <div class="fs-4 fw-bold">12345</div>
+                <div class="text-muted">月阅读量</div>
+            </div>
+        </div>
+        <div class="mt-4">
+            <a href="#" class="btn btn-primary"><i class="ri-search-line me-2"></i>搜索内容</a>
+        </div>
+    </div>
+#endexport
+
 #export("body"):
     <div class="d-flex justify-content-between align-items-center mb-2">
         <h2><i class="ri-star-line me-2"></i>编辑精选</h2>
         <a href="/page/posts/editors-picks" class="btn btn-outline-primary btn-sm">查看全部 <i class="ri-arrow-right-line"></i></a>
-        #if(user):
-            <a href="/page/posts/create" class="btn btn-primary ms-2">➕ New Post</a>
-        #endif
+        
     </div>
     <p class="text-muted mb-4">最值得阅读的技术洞察</p>
 

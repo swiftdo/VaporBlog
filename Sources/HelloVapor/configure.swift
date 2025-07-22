@@ -23,6 +23,7 @@ public func configure(_ app: Application) async throws {
     app.views.use(.leaf)
     app.leaf.tags["flash"] = FlashTag()
     app.leaf.tags["relativeDate"] = RelativeDateTag()
+    app.leaf.tags["firstLetter"] = FirstLetterTag()
     
     // MARK: - 注册数据库
     try databases(app)
