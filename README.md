@@ -2,28 +2,13 @@
 
 基于 Swift Vapor 开发的博客系统。
 
-对应课程：[Swift Vapor 实战](https://mp.weixin.qq.com/mp/appmsgalbum?__biz=MzI4MDM2MDAzOA==&action=getalbum&album_id=4011584829035593730&from_itemidx=1&from_msgid=2247486416#wechat_redirect)
+- 对应课程：[Swift Vapor 实战](https://mp.weixin.qq.com/mp/appmsgalbum?__biz=MzI4MDM2MDAzOA==&action=getalbum&album_id=4011584829035593730&from_itemidx=1&from_msgid=2247486416#wechat_redirect)
+
+- 规划原型：[https://v0-vaporblog-redesign.vercel.app/](https://v0-vaporblog-redesign.vercel.app/)
 
 
-## supervisor 
 
-
-```conf
-# /etc/supervisor/conf.d/vaporblog-oldbird-run.conf
-[program:vaporblog-oldbird-run]
-command=/www/wwwroot/vaporblog.oldbird.run/HelloVapor serve --env production --auto-migrate --port 11806 
-directory=/www/wwwroot/vaporblog.oldbird.run
-autostart=true
-autorestart=true
-user=root
-stdout_logfile=/var/log/supervisor/%(program_name)-stdout.log
-stderr_logfile=/var/log/supervisor/%(program_name)-stderr.log
-```
-
-## 功能规划
-
-
-## 功能规划
+## 后续功能规划
 
 * 前端 
   * [x] 文章、分类、标签
