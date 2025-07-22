@@ -1,15 +1,7 @@
 <div class="card mb-4">
     <div class="card-body">
-        <h5 class="card-title">About</h5>
-        <p class="card-text">A blog about Vapor, Swift, and web development.</p>
-    </div>
-</div>
-
-<div class="card mb-4">
-    <div class="card-body">
-        <h5 class="card-title">Active Authors</h5>
+        <h5 class="card-title fs-4 fw-bold"><i class="ri-group-line me-2"></i>活跃作者</h5>
         <ul class="list-unstyled">
-        <!-- -->
             #for(author in authors):
             <li><a href="/authors/#(author.id)">#(author.name)</a></li>
             #endfor
@@ -17,11 +9,22 @@
     </div>
 </div>
 
-<div class="card">
+<div class="card mb-4">
     <div class="card-body">
-        <h5 class="card-title">Popular Tags</h5>
+        <h5 class="card-title fs-4 fw-bold"><i class="ri-price-tag-3-line me-2"></i>热门标签</h5>
         #for(tag in tags):
         <a href="/tags/#(tag.id)" class="badge bg-secondary text-decoration-none">#(tag.name)</a>
         #endfor
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title fs-4 fw-bold"><i class="ri-bar-chart-line me-2"></i>社区统计</h5>
+        <ul class="list-unstyled">
+            <li><strong>文章总数:</strong> 123</li>
+            <li><strong>用户总数:</strong> 456</li>
+            <li><strong>评论总数:</strong> 789</li>
+        </ul>
     </div>
 </div>
