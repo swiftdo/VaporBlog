@@ -30,9 +30,9 @@ stderr_logfile=/var/log/supervisor/%(program_name)-stderr.log
   * [x] 引入 markdown 编辑器，传值问题，隐藏 id
   * [x] 实现分页
   * [x] 文章阅读量
-  * [ ] 文章显示时间
-  * [ ] 文章添加评论
-    * [ ] 评论添加回复功能
+  * [x] 文章显示时间
+  * [x] 文章添加评论
+    * [x] 评论添加回复功能
   * [ ] tag 对应的文章列表
   * [ ] category 对应的文章列表
   * [ ] 文章搜索

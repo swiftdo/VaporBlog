@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>#(title)</title>
+    <link href="https://cdn.bootcdn.net/ajax/libs/lxgw-wenkai-screen-webfont/1.7.0/style.min.css" rel="stylesheet" />
     <link href="/third/bootstrap-5.3.6/bootstrap.min.css" rel="stylesheet" />
     <link href="/third/sweetalert2-11.22.2/sweetalert2.min.css" rel="stylesheet" />
     <link href="/third/select2-4.1.0-rc.0/select2.min.css" rel="stylesheet" >
