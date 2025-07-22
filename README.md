@@ -2,9 +2,11 @@
 
 基于 Swift Vapor 开发的博客系统。
 
+- 在线预览： [https://vaporblog.oldbird.run/](https://vaporblog.oldbird.run/page/posts)
+
 - 对应课程：[Swift Vapor 实战](https://mp.weixin.qq.com/mp/appmsgalbum?__biz=MzI4MDM2MDAzOA==&action=getalbum&album_id=4011584829035593730&from_itemidx=1&from_msgid=2247486416#wechat_redirect)
 
-- 规划原型：[https://v0-vaporblog-redesign.vercel.app/](https://v0-vaporblog-redesign.vercel.app/)
+- 前端原型规划：[https://v0-vaporblog-redesign.vercel.app/](https://v0-vaporblog-redesign.vercel.app/)
 
 
 
