@@ -9,8 +9,9 @@
     <link href="/styles/me.css" rel="stylesheet" />
 </head>
 <body class="d-flex flex-column min-vh-100">
-    <header class="navbar px-3">
+    <header class="navbar px-3 fixed-top">
         <span class="navbar-brand fw-bold fs-3">OldBirds</span>
+        
         <a href="/page/posts" class="btn btn-primary ms-auto">前往博客系统</a>
     </header>
     <div class="container py-5" style="max-width: 900px;">

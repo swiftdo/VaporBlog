@@ -3,8 +3,12 @@ import Vapor
 /// 定义路由
 func routes(_ app: Application) throws {
     // 默认的根路由
-    app.get { req in
-        return req.view.render("me")
+    app.get { req async throws in
+        return req.redirect(to: "/page/posts")
+    }
+
+    app.get("me") { req async throws in
+        return try await req.view.render("me")
     }
 
     app.get("email") { req async throws in
