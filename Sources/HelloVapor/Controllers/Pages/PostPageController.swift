@@ -140,13 +140,22 @@ struct PostPageController: RouteCollection, @unchecked Sendable {
             "total": AnyEncodable(value: paged.metadata.total),
             "startPage": AnyEncodable(value: startPage),
             "endPage": AnyEncodable(value: endPage),
-            "pageNumbers": AnyEncodable(value: Array(1...paged.metadata.pageCount))
+            "pageNumbers": AnyEncodable(value: Array(1...paged.metadata.pageCount)),
         ]
         var user: OutUser? 
         if let payload, let dbuser = try await User.find(payload.userId, on: req.db) {
             user = OutUser(user: dbuser)
             context["user"] = AnyEncodable(value: user)
         }
+        // 获取推荐作者
+        // 获取推荐标签
+        // 获取推荐分类 
+
+        context["authors"] = AnyEncodable(value: [OutUser]())
+        context["tags"] = AnyEncodable(value: [OutTag]())
+        context["categories"] = AnyEncodable(value: [OutCategory]())
+
+
         return try await req.view.render("posts/index", context)
     }
 

@@ -15,10 +15,18 @@
 <body class="d-flex flex-column min-vh-100">
     #extend("partials/header")
     
-    <main class="flex-fill">
-        #flash()
-        #import("body")
+    <main class="flex-fill container mt-4">
+        <div class="row">
+            <div class="col-md-8">
+                #flash()
+                #import("body")
+            </div>
+            <div class="col-md-4">
+                #extend("partials/sidebar")
+            </div>
+        </div>
     </main>
+
     #extend("partials/footer")
     <script src="/third/bootstrap-5.3.6/bootstrap.bundle.min.js"></script>
     <script src="/scripts/common.js"></script>

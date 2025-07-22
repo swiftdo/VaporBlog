@@ -1,0 +1,27 @@
+<div class="card mb-4">
+    <div class="card-body">
+        <h5 class="card-title">About</h5>
+        <p class="card-text">A blog about Vapor, Swift, and web development.</p>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <h5 class="card-title">Active Authors</h5>
+        <ul class="list-unstyled">
+        <!-- -->
+            #for(author in authors):
+            <li><a href="/authors/#(author.id)">#(author.name)</a></li>
+            #endfor
+        </ul>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">Popular Tags</h5>
+        #for(tag in tags):
+        <a href="/tags/#(tag.id)" class="badge bg-secondary text-decoration-none">#(tag.name)</a>
+        #endfor
+    </div>
+</div>

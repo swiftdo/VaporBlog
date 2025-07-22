@@ -10,6 +10,7 @@
 }
 
 body {
+    padding-top: 70px;
     background-color: var(--background-color);
     color: var(--primary-color);
     font-family: 'LXGW WenKai', sans-serif;
