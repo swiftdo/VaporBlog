@@ -29,6 +29,7 @@ a:hover {
     background-color: var(--surface-color);
     border-bottom: 1px solid var(--border-color);
     box-shadow: 0 2px 4px var(--shadow-color);
+    padding: 0.5rem 0;
 }
 
 .navbar-brand {
@@ -140,4 +141,23 @@ a:hover {
 
 .hero-title {
     font-family: "PingFang SC", "Microsoft YaHei", "SimHei", sans-serif;
+}
+
+.navbar-brand-subtitle {
+    font-size: 0.7em;
+    font-weight: 400;
+    color: var(--secondary-color);
+}
+
+.gradient-icon {
+    background: linear-gradient(to right, #343a40, #6c757d, #343a40);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-size: 200% auto;
+    animation: gradient-animation 3s linear infinite;
+}
+
+@keyframes gradient-animation {
+    0% { background-position: 0% center; }
+    100% { background-position: -200% center; }
 }

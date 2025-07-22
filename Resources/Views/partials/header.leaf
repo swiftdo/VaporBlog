@@ -1,6 +1,12 @@
 <header class="navbar navbar-expand-lg fixed-top">
     <div class="container">
-    <a class="navbar-brand fw-bold" href="/page/posts">VaporBlog</a>
+    <a class="navbar-brand fw-bold d-flex align-items-center" href="/page/posts">
+        <i class="ri-vuejs-fill me-2 gradient-icon" style="font-size: 2.5rem;"></i>
+        <div>
+            VaporBlog
+            <div class="navbar-brand-subtitle">Swift 驱动的技术博客社区</div>
+        </div>
+    </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="切换导航">
         <span class="navbar-toggler-icon"></span>
     </button>
