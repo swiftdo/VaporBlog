@@ -1,6 +1,7 @@
 import Vapor
 import Fluent
 
+// 文章页面
 struct PostPageController: RouteCollection, @unchecked Sendable {
 
     let postService: any PostService

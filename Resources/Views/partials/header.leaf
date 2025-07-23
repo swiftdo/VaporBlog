@@ -13,13 +13,13 @@
     <div class="collapse navbar-collapse" id="navbarContent">
         <ul class="navbar-nav ms-auto">
             <li class="nav-item me-3">
-                <a class="nav-link" href="/page/posts"><i class="ri-home-line me-1"></i>首页</a>
+                <a class="nav-link" href="/page/index"><i class="ri-home-line me-1"></i>首页</a>
             </li>
             <li class="nav-item me-3">
                 <a class="nav-link" href="/page/posts"><i class="ri-article-line me-1"></i>文章</a>
             </li>
             <li class="nav-item me-3">
-                <a class="nav-link" href="/page/users"><i class="ri-group-line me-1"></i>作者</a>
+                <a class="nav-link" href="/page/authors"><i class="ri-group-line me-1"></i>作者</a>
             </li>
             <li class="nav-item me-3">
                 <a class="nav-link" href="/me"><i class="ri-global-line me-1"></i>站长</a>
