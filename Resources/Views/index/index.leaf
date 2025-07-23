@@ -4,7 +4,7 @@
 文章列表
 #endexport
 
-#export("rightSide"):
+#export("topSide"):
 <div class="text-center py-5 mb-4 bg-light rounded">
         <h1 class="display-2 fw-bold hero-title">技术思考的<br>聚集地</h1>
         <p class="lead text-secondary fw-normal">汇聚优秀的技术文章，分享深度的编程见解，<br>在这里与技术大脑进行思想碰撞</p>
@@ -137,6 +137,10 @@
     </div>
 
     
+#endexport
+
+#export("rightSide"):
+#extend("partials/sidebar")
 #endexport
 
 #endextend

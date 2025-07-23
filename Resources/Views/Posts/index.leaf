@@ -4,15 +4,19 @@
 文章列表
 #endexport
 
-#export("rightSide"):
+#export("topSide"):
 <div class="text-center py-5 mb-4 bg-light rounded">
         <h1 class="display-2 fw-bold hero-title">全部文章</h1>
         <p class="lead text-secondary fw-normal">发现优质技术内容，与技术专家深度交流</p>
         
         <div class="mt-4">
-            <a href="#" class="btn btn-primary"><i class="ri-search-line me-2"></i>搜索内容</a>
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="搜索文章、作者、标签..." aria-label="搜索文章">
+                <button class="btn btn-outline-primary" type="button"><i class="ri-search-line"></i></button>
+            </div>
+            
         </div>
-    </div>
+</div>
 #endexport
 
 #export("body"):
@@ -69,8 +73,17 @@
     <div class="text-center mt-4 mb-5">
         <button class="btn btn-outline-primary" onclick="loadMoreArticles()">加载更多</button>
     </div>
-
-    
 #endexport
 
+
+#export("rightSide"):
+#extend("partials/sidebar")
+#endexport
+
+
+
 #endextend
+
+
+
+

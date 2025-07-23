@@ -16,17 +16,17 @@
 </head>
 <body class="d-flex flex-column min-vh-100">
     #extend("partials/header")
+    #flash()
     
-    #import("rightSide")
 
     <main class="flex-fill container mt-4">
+        #import("topSide")
         <div class="row">
-            <div class="col-md-8">
-                #flash()
+            <div class="col-md-9">
                 #import("body")
             </div>
-            <div class="col-md-4">
-                #extend("partials/sidebar")
+            <div class="col-md-3">
+                #import("rightSide")
             </div>
         </div>
     </main>
