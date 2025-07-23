@@ -47,6 +47,27 @@ a:hover {
     border-top: 1px solid var(--border-color);
     padding: 1.5rem 0;
     color: var(--secondary-color);
+    margin-top: auto;
+}
+
+.footer p {
+    font-size: 0.875rem;
+    margin-bottom: 0.25rem;
+}
+
+.footer .navbar-brand {
+    display: inline-flex !important;
+    justify-content: center !important;
+    margin: 0 auto 0.5rem auto;
+    font-size: 1.25rem;
+}
+
+.footer a.navbar-brand:hover {
+    color: var(--primary-color);
+}
+
+.footer a.navbar-brand:focus {
+    outline: none;
 }
 
 .card {

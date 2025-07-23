@@ -1,10 +1,16 @@
-<footer class="text-center py-4 mt-auto">
+<footer class="footer">
     <div class="container">
-        <small>
-            © 2025 OldBirds &nbsp;|&nbsp; 
-            <a href="https://github.com/oheroj" target="_blank">GitHub</a> &nbsp;|&nbsp;
-            <a href="#">Twitter</a> &nbsp;|&nbsp;
-            <a href="#">Contact</a>
-        </small>
+        <div class="row">
+            <div class="col-12 text-center">
+                <a class="navbar-brand fw-bold d-flex justify-content-center align-items-center" href="/page/posts">
+                    <i class="ri-vuejs-fill me-2 gradient-icon" style="font-size: 1.5rem;"></i>
+                    <div>
+                        VaporBlog
+                    </div>
+                </a>
+                <p class="mb-0 mt-2">© 2025 OldBirds</p>
+                <p class="mb-0">Built with Vapor</p>
+            </div>
+        </div>
     </div>
 </footer>
