@@ -17,8 +17,6 @@
 <body class="d-flex flex-column min-vh-100">
     #extend("partials/header")
     #flash()
-    
-
     <main class="flex-fill container mt-4">
         #import("topSide")
         <div class="row">
